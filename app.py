@@ -442,7 +442,7 @@ def init_mysql_db():
     print("✅ MySQL Database initialized successfully!")
 
 # ---------- Uncomment this line ONLY ONCE to create tables, then comment it out again ----------
-# init_mysql_db()
+init_mysql_db()
 
 # ---------- Helper Functions ----------
 def require_login(f):
