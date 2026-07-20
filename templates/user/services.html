@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Services | User Panel</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        * { font-family: 'Inter', sans-serif; }
+        body { background: #0a0a0f; }
+        .gradient-bg { 
+            background: radial-gradient(ellipse at 20% 50%, rgba(6, 182, 212, 0.06) 0%, transparent 60%),
+                        radial-gradient(ellipse at 80% 50%, rgba(15, 23, 42, 0.8) 0%, #0a0a0f 100%);
+            min-height: 100vh;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.02);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            overflow: hidden;
+        }
+        .search-box {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 12px;
+            padding: 10px 16px 10px 40px;
+            color: white;
+            width: 100%;
+            max-width: 300px;
+            transition: all 0.3s ease;
+        }
+        .search-box:focus { outline: none; border-color: rgba(6, 182, 212, 0.4); }
+        .search-box::placeholder { color: rgba(255, 255, 255, 0.25); }
+        .price-tag {
+            font-variant-numeric: tabular-nums;
+            background: linear-gradient(135deg, rgba(6, 182, 212, 0.12), rgba(6, 182, 212, 0.04));
+            padding: 2px 12px;
+            border-radius: 20px;
+            border: 1px solid rgba(6, 182, 212, 0.12);
+            color: #22d3ee;
+            font-weight: 600;
+        }
+        .type-badge {
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 9px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+        .type-badge.standard { background: rgba(16, 185, 129, 0.12); color: #34d399; }
+        .type-badge.express { background: rgba(251, 191, 36, 0.12); color: #fbbf24; }
+        .type-badge.premium { background: rgba(244, 63, 94, 0.12); color: #fb7185; }
+        .type-badge.general { background: rgba(168, 85, 247, 0.12); color: #a78bfa; }
+        .order-btn {
+            background: linear-gradient(135deg, #06b6d4, #0891b2);
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(6, 182, 212, 0.2);
+        }
+        .order-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(6, 182, 212, 0.35);
+        }
+        .exchange-rate-badge {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 20px;
+            padding: 2px 12px;
+            font-size: 10px;
+            color: rgba(255,255,255,0.3);
+        }
+        .table-row {
+            transition: all 0.2s ease;
+            border-bottom: 1px solid rgba(255,255,255,0.03);
+        }
+        .table-row:hover {
+            background: rgba(255,255,255,0.03);
+        }
+        .category-pill {
+            padding: 2px 12px;
+            border-radius: 20px;
+            font-size: 10px;
+            font-weight: 600;
+            background: rgba(255,255,255,0.06);
+            color: rgba(255,255,255,0.5);
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .category-pill i { font-size: 10px; }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(6, 182, 212, 0.3); border-radius: 10px; }
+        .filter-select {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 12px;
+            padding: 8px 16px;
+            color: white;
+            font-size: 13px;
+            outline: none;
+            cursor: pointer;
+        }
+        .filter-select:focus { border-color: rgba(6, 182, 212, 0.4); }
+        .filter-select option { background: #1e293b; color: white; }
+    </style>
+</head>
+<body>
+
+    <div class="flex h-screen overflow-hidden">
+        <!-- Sidebar -->
+        <aside class="w-64 bg-black/40 backdrop-blur-sm border-r border-white/5 p-4 flex flex-col fixed h-full overflow-y-auto">
+            <div class="flex items-center gap-3 pb-6 border-b border-white/5">
+                <div class="p-2.5 bg-gradient-to-br from-cyan-600 to-teal-600 rounded-xl shadow-lg shadow-cyan-500/20">
+                    <i class="fa-solid fa-chart-line text-white text-sm"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-sm tracking-wide text-white">User Panel</h1>
+                    <p class="text-[10px] text-white/40">{{ session.username }}</p>
+                </div>
+            </div>
+            <nav class="flex-1 py-5 space-y-1">
+                <a href="{{ url_for('user_dashboard') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm text-white/60 hover:bg-white/5 transition-all hover:text-white">
+                    <i class="fa-solid fa-gauge w-4"></i> ပင်မစာမျက်နှာ
+                </a>
+                <a href="{{ url_for('user_services') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm bg-cyan-600/20 text-cyan-400 border border-cyan-500/20">
+                    <i class="fa-solid fa-list w-4"></i> ဝန်ဆောင်မှုများ
+                </a>
+                <a href="{{ url_for('user_place_order') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm text-white/60 hover:bg-white/5 transition-all hover:text-white">
+                    <i class="fa-solid fa-cart-plus w-4"></i> အမှာစာတင်မည်
+                </a>
+                <a href="{{ url_for('user_deposit') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm text-white/60 hover:bg-white/5 transition-all hover:text-white">
+                    <i class="fa-solid fa-circle-dollar text-emerald-400 w-4"></i> ငွေသွင်းမည်
+                </a>
+                <a href="{{ url_for('user_tickets') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm text-white/60 hover:bg-white/5 transition-all hover:text-white">
+                    <i class="fa-solid fa-envelope-open-text w-4"></i> အကူအညီ
+                </a>
+            </nav>
+            <div class="border-t border-white/5 pt-4">
+                <a href="{{ url_for('logout') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm text-rose-400 hover:bg-rose-500/10 transition-all">
+                    <i class="fa-solid fa-right-from-bracket w-4"></i> ထွက်မည်
+                </a>
+            </div>
+        </aside>
+
+        <!-- Main -->
+        <main class="flex-1 p-8 ml-64 overflow-y-auto gradient-bg">
+            <div class="max-w-7xl mx-auto">
+
+                <!-- Header -->
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+                    <div>
+                        <h2 class="text-2xl font-bold tracking-tight text-white">
+                            <span class="bg-gradient-to-r from-cyan-400 to-teal-400 bg-clip-text text-transparent">📋 ဝန်ဆောင်မှုများ</span>
+                        </h2>
+                        <p class="text-white/40 text-sm mt-1 flex items-center gap-2">
+                            <i class="fa-regular fa-folder-open"></i>
+                            {{ tier|capitalize }} အတွက် ဝန်ဆောင်မှုများ
+                            <span class="text-white/20">•</span>
+                            <span class="text-white/20">{{ services|length }} ခု</span>
+                            <span class="exchange-rate-badge">1 USD = {{ exchange_rate }} MMK</span>
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Search & Filter -->
+                <div class="flex flex-col sm:flex-row gap-4 mb-6">
+                    <div class="relative flex-1 max-w-sm">
+                        <i class="fa-solid fa-search absolute left-4 top-1/2 -translate-y-1/2 text-white/20 text-sm"></i>
+                        <input type="text" id="searchInput" placeholder="ရှာရန်..." class="search-box" oninput="filterServices()">
+                    </div>
+                    <div class="flex gap-2 flex-wrap items-center">
+                        <select id="categoryFilter" class="filter-select" onchange="filterServices()">
+                            <option value="all">📦 အားလုံး</option>
+                            {% set categories = services|map(attribute='category')|unique|sort %}
+                            {% for cat in categories %}
+                            <option value="{{ cat }}">
+                                {% if cat == 'Facebook' %}📘{% elif cat == 'Instagram' %}📸{% elif cat == 'YouTube' %}▶️{% elif cat == 'TikTok' %}🎵{% elif cat == 'Telegram' %}✈️{% elif cat == 'Twitter' %}🐦{% elif cat == 'Spotify' %}🎧{% elif cat == 'Website' %}🌐{% else %}📦{% endif %}
+                                {{ cat }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                        <span class="text-white/20 text-xs">|</span>
+                        <span class="text-white/30 text-xs" id="resultCount">{{ services|length }} ခုတွေ့ရှိ</span>
+                    </div>
+                </div>
+
+                <!-- Services Table -->
+                <div class="glass-card">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm">
+                            <thead>
+                                <tr class="text-left text-white/30 border-b border-white/5 text-xs font-semibold uppercase tracking-wider">
+                                    <th class="py-3 px-4">#</th>
+                                    <th class="py-3 px-4">ဝန်ဆောင်မှုအမည်</th>
+                                    <th class="py-3 px-4">အမျိုးအစား</th>
+                                    <th class="py-3 px-4 text-right">ဈေးနှုန်း (MMK/1K)</th>
+                                    <th class="py-3 px-4 text-center">အနည်းဆုံး/အများဆုံး</th>
+                                    <th class="py-3 px-4 text-center">အမျိုးအစား</th>
+                                    <th class="py-3 px-4 text-center">လုပ်ဆောင်ချက်</th>
+                                </tr>
+                            </thead>
+                            <tbody id="servicesTableBody">
+                                {% for service in services %}
+                                <tr class="table-row" data-category="{{ service.category }}" data-name="{{ service.name|lower }}">
+                                    <td class="py-3 px-4 text-white/20 font-mono text-[10px]">{{ service.id }}</td>
+                                    <td class="py-3 px-4">
+                                        <div class="font-medium text-white text-sm">{{ service.name }}</div>
+                                        {% if service.description %}
+                                        <div class="text-white/20 text-[10px] truncate max-w-xs">{{ service.description }}</div>
+                                        {% endif %}
+                                    </td>
+                                    <td class="py-3 px-4">
+                                        <span class="category-pill">
+                                            {% if service.category == 'Facebook' %}<i class="fa-brands fa-facebook-f text-blue-400"></i>
+                                            {% elif service.category == 'Instagram' %}<i class="fa-brands fa-instagram text-pink-400"></i>
+                                            {% elif service.category == 'YouTube' %}<i class="fa-brands fa-youtube text-red-400"></i>
+                                            {% elif service.category == 'TikTok' %}<i class="fa-brands fa-tiktok text-cyan-400"></i>
+                                            {% elif service.category == 'Telegram' %}<i class="fa-brands fa-telegram text-sky-400"></i>
+                                            {% else %}<i class="fa-regular fa-folder"></i>{% endif %}
+                                            {{ service.category }}
+                                        </span>
+                                    </td>
+                                    <td class="py-3 px-4 text-right">
+                                        <span class="price-tag text-sm">{{ "%.0f"|format(service.display_price_mmk) }}</span>
+                                    </td>
+                                    <td class="py-3 px-4 text-center text-white/40 text-[10px]">
+                                        {{ service.min_order }} – {{ service.max_order }}
+                                    </td>
+                                    <td class="py-3 px-4 text-center">
+                                        <span class="type-badge {{ service.service_type or 'standard' }}">
+                                            {% if service.service_type == 'express' %}⚡ အမြန်
+                                            {% elif service.service_type == 'premium' %}⭐ Premium
+                                            {% elif service.service_type == 'general' %}🟣 General
+                                            {% else %}🟢 စျေးသက်သာ{% endif %}
+                                        </span>
+                                    </td>
+                                    <td class="py-3 px-4 text-center">
+                                        <a href="{{ url_for('user_place_order') }}?service={{ service.id }}" class="order-btn text-white text-xs px-4 py-1.5 rounded-lg font-medium transition inline-flex items-center gap-1">
+                                            <i class="fa-solid fa-cart-plus"></i> Order
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td colspan="7" class="py-12 text-center text-white/30">
+                                        <div class="text-4xl mb-3 opacity-20">📦</div>
+                                        <p>ဝန်ဆောင်မှုများ မရှိသေးပါ</p>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <script>
+        function filterServices() {
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            const category = document.getElementById('categoryFilter').value;
+            const rows = document.querySelectorAll('#servicesTableBody .table-row');
+            let visibleCount = 0;
+            
+            rows.forEach(row => {
+                const rowCategory = row.getAttribute('data-category');
+                const rowName = row.getAttribute('data-name');
+                const matchCategory = category === 'all' || rowCategory === category;
+                const matchSearch = rowName.includes(search);
+                if (matchCategory && matchSearch) {
+                    row.style.display = '';
+                    visibleCount++;
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+            
+            document.getElementById('resultCount').textContent = visibleCount + ' ခုတွေ့ရှိ';
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            filterServices();
+        });
+    </script>
+
+</body>
+</html>

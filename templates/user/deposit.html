@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deposit | SMM Master</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body class="bg-slate-950 text-white">
+
+    <div class="flex h-screen">
+        <aside class="w-64 bg-slate-900 border-r border-slate-800 p-4 flex flex-col fixed h-full overflow-y-auto">
+            <div class="flex items-center gap-3 pb-6 border-b border-slate-800">
+                <div class="p-2 bg-cyan-600 rounded-lg">
+                    <i class="fa-solid fa-chart-line text-white"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-sm">User Panel</h1>
+                    <p class="text-[10px] text-slate-400">{{ session.username }}</p>
+                </div>
+            </div>
+            
+            <nav class="flex-1 py-4 space-y-1">
+                <a href="{{ url_for('user_dashboard') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm text-slate-300 hover:bg-slate-800 transition">
+                    <i class="fa-solid fa-gauge"></i> ပင်မစာမျက်နှာ
+                </a>
+                <a href="{{ url_for('user_services') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm text-slate-300 hover:bg-slate-800 transition">
+                    <i class="fa-solid fa-list"></i> ဝန်ဆောင်မှုများ
+                </a>
+                <a href="{{ url_for('user_place_order') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm text-slate-300 hover:bg-slate-800 transition">
+                    <i class="fa-solid fa-cart-plus"></i> အမှာစာတင်မည်
+                </a>
+                <a href="{{ url_for('user_deposit') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm bg-cyan-600/20 text-cyan-400">
+                    <i class="fa-solid fa-circle-dollar text-emerald-400"></i> ငွေသွင်းမည်
+                </a>
+                <a href="{{ url_for('user_tickets') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm text-slate-300 hover:bg-slate-800 transition">
+                    <i class="fa-solid fa-envelope-open-text"></i> အကူအညီ
+                </a>
+            </nav>
+            
+            <div class="border-t border-slate-800 pt-4">
+                <a href="{{ url_for('logout') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm text-rose-400 hover:bg-rose-950/30 transition">
+                    <i class="fa-solid fa-right-from-bracket"></i> ထွက်မည်
+                </a>
+            </div>
+        </aside>
+
+        <main class="flex-1 p-6 ml-64 overflow-y-auto">
+            <h2 class="text-2xl font-bold mb-6">💰 ငွေသွင်းမည်</h2>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-6">
+                    <h3 class="text-lg font-bold mb-4">📝 ငွေသွင်းလျှောက်လွှာ</h3>
+                    <form method="POST" class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-400 uppercase mb-1">ငွေသွင်းနည်းလမ်း</label>
+                            <select name="method_id" id="paymentMethod" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white outline-none focus:ring-2 focus:ring-cyan-500" required>
+                                <option value="">ရွေးပါ</option>
+                                {% for method in methods %}
+                                <option value="{{ method.id }}"
+                                        data-name="{{ method.account_name }}"
+                                        data-number="{{ method.account_number }}"
+                                        data-phone="{{ method.phone }}"
+                                        data-instructions="{{ method.instructions }}">
+                                    {{ method.name }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <!-- Payment Method Details -->
+                        <div id="paymentMethodDetails" class="hidden bg-slate-800/50 p-4 rounded-xl space-y-2 border border-cyan-500/30">
+                            <h4 class="text-sm font-semibold text-cyan-400">📋 ငွေလွှဲရန်အချက်အလက်များ</h4>
+                            <div class="text-sm text-white"><span class="text-slate-400">အကောင့်အမည်:</span> <span id="accName">-</span></div>
+                            <div class="text-sm text-white"><span class="text-slate-400">အကောင့်နံပါတ်:</span> <span id="accNumber">-</span></div>
+                            <div class="text-sm text-white"><span class="text-slate-400">ဖုန်းနံပါတ်:</span> <span id="accPhone">-</span></div>
+                            <div class="text-sm text-white"><span class="text-slate-400">ညွှန်ကြားချက်:</span> <span id="accInstructions">-</span></div>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-400 uppercase mb-1">ငွေပမာဏ (MMK)</label>
+                            <input type="number" name="amount" min="{{ min_deposit }}" step="100" required placeholder="{{ min_deposit }}" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white outline-none focus:ring-2 focus:ring-cyan-500">
+                            <p class="text-xs text-slate-500 mt-1">အနည်းဆုံး {{ "%.0f"|format(min_deposit) }} MMK</p>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-400 uppercase mb-1">ငွေလွှဲသူအမည်</label>
+                            <input type="text" name="sender_name" required class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white outline-none focus:ring-2 focus:ring-cyan-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-400 uppercase mb-1">Transaction ID</label>
+                            <input type="text" name="transaction_id" required class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white outline-none focus:ring-2 focus:ring-cyan-500">
+                        </div>
+                        <button type="submit" class="w-full bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-2.5 rounded-xl transition">
+                            <i class="fa-solid fa-paper-plane mr-2"></i> ငွေသွင်းမည်
+                        </button>
+                    </form>
+                </div>
+
+                <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-6">
+                    <h3 class="text-lg font-bold mb-4">📋 ငွေသွင်းမှတ်တမ်း</h3>
+                    <div class="space-y-3 max-h-[500px] overflow-y-auto">
+                        {% for payment in payments %}
+                        <div class="bg-slate-800/50 p-4 rounded-xl border border-slate-700">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <p class="font-semibold text-white">{{ "%.0f"|format(payment.amount) }} MMK</p>
+                                    <p class="text-xs text-slate-400">{{ payment.method_name }}</p>
+                                </div>
+                                <span class="px-2 py-1 rounded text-xs font-semibold 
+                                    {% if payment.status == 'approved' %}bg-emerald-500/20 text-emerald-400
+                                    {% elif payment.status == 'pending' %}bg-amber-500/20 text-amber-400
+                                    {% else %}bg-rose-500/20 text-rose-400{% endif %}">
+                                    {{ payment.status }}
+                                </span>
+                            </div>
+                            <p class="text-xs text-slate-500 mt-2">
+                                {{ payment.created_at.strftime('%Y-%m-%d') if payment.created_at else '' }}
+                            </p>
+                        </div>
+                        {% else %}
+                        <p class="text-slate-500 text-sm text-center py-4">ငွေသွင်းမှတ်တမ်း မရှိသေးပါ</p>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const select = document.getElementById('paymentMethod');
+            const detailsDiv = document.getElementById('paymentMethodDetails');
+
+            select.addEventListener('change', function() {
+                const selected = this.options[this.selectedIndex];
+                const name = selected.dataset.name || '';
+                const number = selected.dataset.number || '';
+                const phone = selected.dataset.phone || '';
+                const instructions = selected.dataset.instructions || '';
+
+                if (selected.value) {
+                    detailsDiv.classList.remove('hidden');
+                    document.getElementById('accName').textContent = name || '-';
+                    document.getElementById('accNumber').textContent = number || '-';
+                    document.getElementById('accPhone').textContent = phone || '-';
+                    document.getElementById('accInstructions').textContent = instructions || '-';
+                } else {
+                    detailsDiv.classList.add('hidden');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

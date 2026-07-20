@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ပြုပြင်နေပါသည် | SMM Master</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body class="bg-slate-950 text-white min-h-screen flex items-center justify-center">
+    <div class="text-center px-4">
+        <div class="text-8xl mb-6">
+            <i class="fa-solid fa-screwdriver-wrench text-amber-500 animate-bounce"></i>
+        </div>
+        <h1 class="text-4xl md:text-5xl font-bold mb-4">🔧 စနစ်အား ပြုပြင်နေပါသည်</h1>
+        <p class="text-xl text-slate-400 mb-2">ကျွန်ုပ်တို့၏ စနစ်အား ပိုမိုကောင်းမွန်အောင် ပြုပြင်နေပါသည်။</p>
+        <p class="text-lg text-slate-500 mb-8">ကျေးဇူးပြု၍ ခဏစောင့်ဆိုင်းပေးပါ။ မကြာမီ ပြန်လည်ဖွင့်လှစ်ပါမည်။</p>
+        
+        <div class="inline-flex items-center gap-2 bg-slate-800/50 px-6 py-3 rounded-xl border border-slate-700">
+            <i class="fa-regular fa-clock text-amber-400"></i>
+            <span class="text-slate-300">ပြန်လည်ဖွင့်လှစ်မည့်အချိန်: <span id="countdown" class="text-amber-400 font-bold">မကြာမီ</span></span>
+        </div>
+        
+        <div class="mt-8 text-sm text-slate-500">
+            <p>အရေးပေါ်ကိစ္စရှိပါက admin@smm-master.com သို့ ဆက်သွယ်ပါ။</p>
+        </div>
+    </div>
+
+    <script>
+        // ရိုးရိုး Countdown Timer (ဥပမာ 5 မိနစ်)
+        let minutes = 5;
+        let seconds = 0;
+        const countdownEl = document.getElementById('countdown');
+
+        function updateCountdown() {
+            if (minutes === 0 && seconds === 0) {
+                countdownEl.textContent = 'မကြာမီ';
+                return;
+            }
+            if (seconds === 0) {
+                minutes--;
+                seconds = 59;
+            } else {
+                seconds--;
+            }
+            countdownEl.textContent = `${minutes}မ ${seconds}စ`;
+            setTimeout(updateCountdown, 1000);
+        }
+
+        // စတင်မည် (သို့မဟုတ် မလိုရင် ဖယ်ပါ)
+        // updateCountdown();
+    </script>
+</body>
+</html>

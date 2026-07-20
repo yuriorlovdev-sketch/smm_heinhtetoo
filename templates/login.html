@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SMM Master - Login</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body class="login-bg min-h-screen flex items-center justify-center p-4">
+
+    <div class="w-full max-w-md glass-card rounded-3xl p-8 shadow-2xl">
+        <!-- Brand -->
+        <div class="text-center mb-8">
+            <div class="inline-flex p-4 bg-gradient-to-br from-violet-600 to-cyan-600 rounded-2xl shadow-xl shadow-violet-500/20">
+                <i class="fa-solid fa-server text-white text-3xl"></i>
+            </div>
+            <h2 class="text-3xl font-extrabold mt-3 text-white tracking-tight">SMM MASTER</h2>
+            <p class="text-slate-400 text-sm mt-1">Professional SMM Panel</p>
+        </div>
+
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="mb-4 p-3 rounded-xl text-sm 
+                        {% if category == 'success' %}bg-emerald-500/20 text-emerald-400 border border-emerald-500/30
+                        {% elif category == 'error' %}bg-rose-500/20 text-rose-400 border border-rose-500/30
+                        {% else %}bg-blue-500/20 text-blue-400 border border-blue-500/30{% endif %}">
+                        <i class="fa-solid fa-circle-info mr-2"></i> {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <!-- Login Form -->
+        <form method="POST" class="space-y-5">
+            {% if error %}
+            <div class="bg-rose-500/10 border border-rose-500/30 text-rose-400 text-sm p-3 rounded-xl flex items-center gap-2">
+                <i class="fa-solid fa-circle-exclamation"></i> {{ error }}
+            </div>
+            {% endif %}
+
+            <div>
+                <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">အသုံးပြုသူအမည်</label>
+                <div class="relative">
+                    <span class="absolute left-3 top-3.5 text-slate-500"><i class="fa-regular fa-user"></i></span>
+                    <input type="text" name="username" required class="w-full bg-slate-900/80 border border-slate-700/60 rounded-xl pl-10 pr-4 py-3 text-sm text-white focus:outline-none focus:ring-2 focus:ring-violet-500/50 transition" placeholder="Enter username">
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">စကားဝှက်</label>
+                <div class="relative">
+                    <span class="absolute left-3 top-3.5 text-slate-500"><i class="fa-solid fa-lock"></i></span>
+                    <input type="password" name="password" required class="w-full bg-slate-900/80 border border-slate-700/60 rounded-xl pl-10 pr-4 py-3 text-sm text-white focus:outline-none focus:ring-2 focus:ring-violet-500/50 transition" placeholder="••••••••">
+                </div>
+            </div>
+
+            <button type="submit" class="w-full py-3.5 bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 rounded-xl font-bold text-sm tracking-wide shadow-lg shadow-violet-500/20 transition-all flex items-center justify-center gap-2 text-white">
+                <i class="fa-solid fa-right-to-bracket"></i> ဝင်မည်
+            </button>
+        </form>
+
+        <!-- Footer -->
+        <div class="mt-6 text-center text-xs text-slate-500 border-t border-slate-800/60 pt-4">
+            <p>အကောင့်မရှိသေးဘူးလား? <a href="{{ url_for('register') }}" class="text-violet-400 hover:text-violet-300 font-semibold">အကောင့်ဖွင့်မည်</a></p>
+            <p class="mt-2">Default Admin: <span class="text-violet-400 font-mono">admin / admin123</span></p>
+            <p class="mt-1">Default Reseller: <span class="text-cyan-400 font-mono">kings / agent123</span></p>
+            <p class="mt-1">Default User: <span class="text-slate-400 font-mono">user / user123</span></p>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>

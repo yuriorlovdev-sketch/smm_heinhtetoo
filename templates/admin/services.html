@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Services | SMM Admin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        * { font-family: 'Inter', sans-serif; }
+        body { background: #0a0a0f; }
+        .gradient-bg { 
+            background: radial-gradient(ellipse at 20% 50%, rgba(88, 28, 135, 0.10) 0%, transparent 60%),
+                        radial-gradient(ellipse at 80% 50%, rgba(15, 23, 42, 0.8) 0%, #0a0a0f 100%);
+            min-height: 100vh;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 16px;
+            overflow: hidden;
+        }
+        .glass-card:hover {
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+        .category-header {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.95));
+            border-bottom: 2px solid rgba(255, 255, 255, 0.05);
+            padding: 12px 24px;
+        }
+        .btn-success {
+            background: linear-gradient(135deg, #10b981, #059669);
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(16, 185, 129, 0.25);
+        }
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(16, 185, 129, 0.35);
+        }
+        .btn-danger {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(239, 68, 68, 0.2);
+        }
+        .btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(239, 68, 68, 0.3);
+        }
+        .btn-edit {
+            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(139, 92, 246, 0.2);
+        }
+        .btn-edit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(139, 92, 246, 0.3);
+        }
+        .search-box {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 10px 16px 10px 40px;
+            color: white;
+            width: 100%;
+            max-width: 320px;
+            transition: all 0.3s ease;
+        }
+        .search-box:focus {
+            outline: none;
+            border-color: rgba(139, 92, 246, 0.4);
+            box-shadow: 0 0 20px rgba(139, 92, 246, 0.08);
+        }
+        .search-box::placeholder { color: rgba(255, 255, 255, 0.25); }
+        .category-filter-btn {
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            color: rgba(255, 255, 255, 0.6);
+            cursor: pointer;
+        }
+        .category-filter-btn:hover {
+            background: rgba(255, 255, 255, 0.08);
+            color: white;
+        }
+        .category-filter-btn.active {
+            background: rgba(139, 92, 246, 0.15);
+            border-color: rgba(139, 92, 246, 0.3);
+            color: #a78bfa;
+        }
+        .status-badge {
+            padding: 3px 12px;
+            border-radius: 20px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+        .status-badge.active {
+            background: rgba(16, 185, 129, 0.15);
+            color: #34d399;
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+        .status-badge.inactive {
+            background: rgba(244, 63, 94, 0.15);
+            color: #fb7185;
+            border: 1px solid rgba(244, 63, 94, 0.2);
+        }
+        .table-row {
+            transition: all 0.2s ease;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+        }
+        .table-row:hover {
+            background: rgba(255, 255, 255, 0.03);
+        }
+        .action-btn {
+            padding: 6px 10px;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            color: rgba(255, 255, 255, 0.5);
+            cursor: pointer;
+            font-size: 13px;
+        }
+        .action-btn:hover {
+            background: rgba(255, 255, 255, 0.08);
+        }
+        .action-btn.edit:hover {
+            border-color: rgba(139, 92, 246, 0.3);
+            color: #a78bfa;
+        }
+        .action-btn.delete:hover {
+            border-color: rgba(239, 68, 68, 0.3);
+            color: #f87171;
+        }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(139, 92, 246, 0.3); border-radius: 10px; }
+        .provider-tag {
+            font-size: 10px;
+            padding: 2px 10px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            color: rgba(255, 255, 255, 0.5);
+        }
+        .category-icon {
+            width: 28px;
+            height: 28px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            font-size: 12px;
+            margin-right: 8px;
+        }
+        .price-usd { color: #94a3b8; font-weight: 500; }
+        .price-mmk { color: #22d3ee; font-weight: 600; }
+        .service-id { font-size: 11px; color: rgba(255,255,255,0.2); font-family: monospace; }
+        .service-count-badge {
+            background: rgba(255,255,255,0.06);
+            padding: 2px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+        }
+        .category-group {
+            margin-bottom: 24px;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            overflow: hidden;
+        }
+        .category-group.hidden-group {
+            display: none !important;
+        }
+        /* Modal styles */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(8px);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .modal-box {
+            background: #1e293b;
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 20px;
+            padding: 32px;
+            max-width: 600px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            transform: scale(0.95);
+            transition: transform 0.3s ease;
+        }
+        .modal-overlay.active .modal-box {
+            transform: scale(1);
+        }
+        .modal-box label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+        .modal-box input, .modal-box select, .modal-box textarea {
+            width: 100%;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 10px;
+            padding: 10px 14px;
+            color: white;
+            font-size: 14px;
+            transition: border-color 0.2s;
+        }
+        .modal-box input:focus, .modal-box select:focus, .modal-box textarea:focus {
+            outline: none;
+            border-color: rgba(139, 92, 246, 0.5);
+        }
+        .modal-box .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+        .modal-box .form-group { margin-bottom: 16px; }
+        .modal-close {
+            position: absolute;
+            top: 16px;
+            right: 20px;
+            background: none;
+            border: none;
+            color: #94a3b8;
+            font-size: 24px;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+        .modal-close:hover { color: white; }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            position: relative;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="flex h-screen overflow-hidden">
+        <!-- Sidebar -->
+        <aside class="w-64 bg-black/40 backdrop-blur-sm border-r border-white/5 p-4 flex flex-col fixed h-full overflow-y-auto">
+            <div class="flex items-center gap-3 pb-6 border-b border-white/5">
+                <div class="p-2.5 bg-gradient-to-br from-violet-600 to-indigo-600 rounded-xl shadow-lg shadow-violet-500/25">
+                    <i class="fa-solid fa-screwdriver-wrench text-white text-sm"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-sm tracking-wide text-white">SMM Admin</h1>
+                    <p class="text-[10px] text-white/40">{{ session.username }}</p>
+                </div>
+            </div>
+            <nav class="flex-1 py-5 space-y-1">
+                <a href="{{ url_for('admin_dashboard') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm text-white/60 hover:bg-white/5 transition-all hover:text-white">
+                    <i class="fa-solid fa-gauge w-4"></i> Dashboard
+                </a>
+                <a href="{{ url_for('admin_users') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm text-white/60 hover:bg-white/5 transition-all hover:text-white">
+                    <i class="fa-solid fa-users w-4"></i> သုံးစွဲသူများ
+                </a>
+                <a href="{{ url_for('admin_orders') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm text-white/60 hover:bg-white/5 transition-all hover:text-white">
+                    <i class="fa-solid fa-cubes w-4"></i> အမှာစာများ
+                </a>
+                <a href="{{ url_for('admin_services') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm bg-violet-600/20 text-violet-400 border border-violet-500/20">
+                    <i class="fa-solid fa-list w-4"></i> ဝန်ဆောင်မှုများ
+                </a>
+                <a href="{{ url_for('admin_providers') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm text-white/60 hover:bg-white/5 transition-all hover:text-white">
+                    <i class="fa-solid fa-plug w-4"></i> Providers
+                </a>
+                <a href="{{ url_for('admin_payment_methods') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm text-white/60 hover:bg-white/5 transition-all hover:text-white">
+                    <i class="fa-solid fa-wallet text-emerald-400 w-4"></i> ငွေသွင်းနည်းလမ်းများ
+                </a>
+                <a href="{{ url_for('admin_payments') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm text-white/60 hover:bg-white/5 transition-all hover:text-white">
+                    <i class="fa-solid fa-circle-dollar w-4"></i> ငွေသွင်းလျှောက်လွှာများ
+                </a>
+                <a href="{{ url_for('admin_withdraws') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm text-white/60 hover:bg-white/5 transition-all hover:text-white">
+                    <i class="fa-solid fa-money-bill-wave text-rose-400 w-4"></i> ငွေထုတ်
+                </a>
+                <a href="{{ url_for('admin_tickets') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm text-white/60 hover:bg-white/5 transition-all hover:text-white">
+                    <i class="fa-solid fa-envelope-open-text w-4"></i> အကူအညီတောင်းများ
+                </a>
+                <a href="{{ url_for('admin_settings') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm text-white/60 hover:bg-white/5 transition-all hover:text-white">
+                    <i class="fa-solid fa-gear w-4"></i> စနစ်ပြင်ဆင်မှု
+                </a>
+            </nav>
+            <div class="border-t border-white/5 pt-4">
+                <a href="{{ url_for('logout') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm text-rose-400 hover:bg-rose-500/10 transition-all">
+                    <i class="fa-solid fa-right-from-bracket w-4"></i> ထွက်မည်
+                </a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 p-8 ml-64 overflow-y-auto gradient-bg">
+            <div class="max-w-7xl mx-auto">
+
+                <!-- Header -->
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+                    <div>
+                        <h2 class="text-2xl font-bold tracking-tight text-white">
+                            <span class="bg-gradient-to-r from-violet-400 to-indigo-400 bg-clip-text text-transparent">ဝန်ဆောင်မှုများ</span>
+                        </h2>
+                        <p class="text-white/40 text-sm mt-1 flex items-center gap-2">
+                            <i class="fa-regular fa-folder-open"></i>
+                            SocPanel မှ ဒေတာများ
+                            <span class="text-white/20">•</span>
+                            <span class="text-white/20">{{ services|length }} ခု</span>
+                        </p>
+                    </div>
+                    <div class="flex gap-3 flex-wrap">
+                        <button onclick="syncSocPanelServices()" class="btn-success text-white px-5 py-2.5 rounded-xl text-sm font-semibold flex items-center gap-2">
+                            <i class="fa-solid fa-rotate"></i> SocPanel Sync
+                        </button>
+                        <button onclick="deleteAllServices()" class="btn-danger text-white px-5 py-2.5 rounded-xl text-sm font-semibold flex items-center gap-2">
+                            <i class="fa-solid fa-trash-can"></i> အကုန်လုံးဖျက်မည်
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Message -->
+                <div id="syncMessage" class="hidden mb-5 p-3 rounded-xl text-sm glass-card border border-white/10"></div>
+
+                <!-- Search & Category Filter -->
+                <div class="flex flex-col sm:flex-row gap-4 mb-6">
+                    <div class="relative flex-1 max-w-sm">
+                        <i class="fa-solid fa-search absolute left-4 top-1/2 -translate-y-1/2 text-white/20 text-sm"></i>
+                        <input type="text" id="searchInput" placeholder="ရှာရန်..." class="search-box" oninput="filterServices()">
+                    </div>
+                    <div class="flex gap-2 flex-wrap" id="categoryFilters">
+                        <button class="category-filter-btn active" data-category="all" onclick="filterByCategory('all', this)">📦 အားလုံး</button>
+                        {% set categories = services|map(attribute='category')|unique|sort %}
+                        {% for cat in categories %}
+                        <button class="category-filter-btn" data-category="{{ cat }}" onclick="filterByCategory('{{ cat }}', this)">
+                            {% if cat == 'Facebook' %}📘{% elif cat == 'Instagram' %}📸{% elif cat == 'YouTube' %}▶️{% elif cat == 'TikTok' %}🎵{% elif cat == 'Telegram' %}✈️{% elif cat == 'Twitter' %}🐦{% elif cat == 'Spotify' %}🎧{% elif cat == 'Website' %}🌐{% else %}📦{% endif %}
+                            {{ cat }}
+                        </button>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Services Grouped by Category -->
+                <div id="servicesContainer">
+                    {% set categories = services|groupby('category') %}
+                    {% for category_group in categories %}
+                    {% set category = category_group.grouper %}
+                    {% set category_services = category_group.list %}
+                    
+                    <div class="category-group glass-card" data-category="{{ category }}">
+                        <!-- Category Header -->
+                        <div class="category-header flex items-center gap-3">
+                            <div class="category-icon 
+                                {% if category == 'Facebook' %}bg-blue-500/20 text-blue-400
+                                {% elif category == 'Instagram' %}bg-pink-500/20 text-pink-400
+                                {% elif category == 'YouTube' %}bg-red-500/20 text-red-400
+                                {% elif category == 'TikTok' %}bg-cyan-500/20 text-cyan-400
+                                {% elif category == 'Telegram' %}bg-sky-500/20 text-sky-400
+                                {% elif category == 'Twitter' %}bg-gray-500/20 text-gray-400
+                                {% elif category == 'Spotify' %}bg-green-500/20 text-green-400
+                                {% elif category == 'Website' %}bg-indigo-500/20 text-indigo-400
+                                {% else %}bg-slate-500/20 text-slate-400{% endif %}">
+                                {% if category == 'Facebook' %}<i class="fa-brands fa-facebook-f"></i>
+                                {% elif category == 'Instagram' %}<i class="fa-brands fa-instagram"></i>
+                                {% elif category == 'YouTube' %}<i class="fa-brands fa-youtube"></i>
+                                {% elif category == 'TikTok' %}<i class="fa-brands fa-tiktok"></i>
+                                {% elif category == 'Telegram' %}<i class="fa-brands fa-telegram"></i>
+                                {% elif category == 'Twitter' %}<i class="fa-brands fa-x-twitter"></i>
+                                {% elif category == 'Spotify' %}<i class="fa-brands fa-spotify"></i>
+                                {% else %}<i class="fa-solid fa-tag"></i>{% endif %}
+                            </div>
+                            <h3 class="text-lg font-bold text-white">{{ category }}</h3>
+                            <span class="service-count-badge text-white/50">{{ category_services|length }} ခု</span>
+                            <div class="ml-auto text-xs text-white/30">
+                                <i class="fa-regular fa-clock"></i> {{ now.strftime('%H:%M') }}
+                            </div>
+                        </div>
+
+                        <!-- Table -->
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left">
+                                <thead class="bg-white/5 text-white/40 text-xs uppercase tracking-wider">
+                                    <tr>
+                                        <th class="px-5 py-3 font-semibold">ID</th>
+                                        <th class="px-5 py-3 font-semibold min-w-[180px]">ဝန်ဆောင်မှု</th>
+                                        <th class="px-5 py-3 font-semibold">Provider</th>
+                                        <th class="px-5 py-3 font-semibold text-right">နှုန်းထား (USD)</th>
+                                        <th class="px-5 py-3 font-semibold text-right">နှုန်းထား (MMK)</th>
+                                        <th class="px-5 py-3 font-semibold text-center">Provider Service ID</th>
+                                        <th class="px-5 py-3 font-semibold text-center">အခြေအနေ</th>
+                                        <th class="px-5 py-3 font-semibold text-center">လုပ်ဆောင်ချက်</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-white/5">
+                                    {% for service in category_services %}
+                                    <tr class="table-row" data-name="{{ service.name|lower }}" data-id="{{ service.id }}">
+                                        <td class="px-5 py-3 text-sm">
+                                            <span class="service-id">#{{ service.id }}</span>
+                                        </td>
+                                        <td class="px-5 py-3">
+                                            <span class="text-sm font-medium text-white">{{ service.name }}</span>
+                                        </td>
+                                        <td class="px-5 py-3">
+                                            <span class="provider-tag">
+                                                {% if service.provider_id %}
+                                                    {% for provider in providers %}
+                                                        {% if provider.id == service.provider_id %}
+                                                            {{ provider.name }}
+                                                        {% endif %}
+                                                    {% endfor %}
+                                                {% else %}
+                                                    —
+                                                {% endif %}
+                                            </span>
+                                        </td>
+                                        <td class="px-5 py-3 text-right">
+                                            <span class="price-usd">{{ "%.4f"|format(service.rate) }}</span>
+                                        </td>
+                                        <td class="px-5 py-3 text-right">
+                                            <span class="price-mmk">{{ "%.0f"|format(service.rate * exchange_rate) }}</span>
+                                        </td>
+                                        <td class="px-5 py-3 text-center">
+                                            <span class="text-xs text-white/50 font-mono">{{ service.provider_service_id or '-' }}</span>
+                                        </td>
+                                        <td class="px-5 py-3 text-center">
+                                            <span class="status-badge {% if service.status == 'active' %}active{% else %}inactive{% endif %}">
+                                                {{ service.status }}
+                                            </span>
+                                        </td>
+                                        <td class="px-5 py-3 text-center">
+                                            <div class="flex items-center justify-center gap-1">
+                                                <button onclick="openEditModal({{ service.id }})" class="action-btn edit" title="တည်းဖြတ်မည်">
+                                                    <i class="fa-solid fa-pen-to-square"></i>
+                                                </button>
+                                                <button onclick="deleteService({{ service.id }})" class="action-btn delete" title="ဖျက်မည်">
+                                                    <i class="fa-solid fa-trash"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-16 text-white/30 glass-card p-12">
+                        <div class="text-5xl mb-4 opacity-20">📦</div>
+                        <p class="text-lg">ဝန်ဆောင်မှုများ မရှိသေးပါ</p>
+                        <button onclick="syncSocPanelServices()" class="mt-4 btn-success text-white px-6 py-2.5 rounded-xl text-sm font-semibold">
+                            SocPanel Sync လုပ်ရန်
+                        </button>
+                    </div>
+                    {% endfor %}
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- ===== EDIT MODAL ===== -->
+    <div class="modal-overlay" id="editModal">
+        <div class="modal-box relative">
+            <div class="modal-header">
+                <h3 class="text-xl font-bold text-white">✏️ ဝန်ဆောင်မှု တည်းဖြတ်ခြင်း</h3>
+                <button class="modal-close" onclick="closeEditModal()">&times;</button>
+            </div>
+            <form id="editForm" onsubmit="submitEdit(event)">
+                <input type="hidden" id="editServiceId" name="service_id">
+                
+                <div class="form-group">
+                    <label>ဝန်ဆောင်မှုအမည်</label>
+                    <input type="text" id="editName" name="name" required>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>အမျိုးအစား</label>
+                        <input type="text" id="editCategory" name="category" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Provider Service ID</label>
+                        <input type="text" id="editProviderServiceId" name="provider_service_id">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>နှုန်းထား (USD)</label>
+                        <input type="number" step="0.0001" id="editRate" name="rate" required>
+                    </div>
+                    <div class="form-group">
+                        <label>အမြတ်နှုန်း (Markup %)</label>
+                        <input type="number" step="0.5" id="editMarkup" name="markup" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>အနည်းဆုံး အရေအတွက်</label>
+                        <input type="number" id="editMinOrder" name="min_order" required>
+                    </div>
+                    <div class="form-group">
+                        <label>အများဆုံး အရေအတွက်</label>
+                        <input type="number" id="editMaxOrder" name="max_order" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Service အမျိုးအစား</label>
+                        <select id="editServiceType" name="service_type">
+                            <option value="standard">Standard</option>
+                            <option value="express">Express</option>
+                            <option value="premium">Premium</option>
+                            <option value="general">General</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>အခြေအနေ</label>
+                        <select id="editStatus" name="status">
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Provider</label>
+                    <select id="editProviderId" name="provider_id">
+                        <option value="">— ရွေးရန် —</option>
+                        {% for provider in providers %}
+                        <option value="{{ provider.id }}">{{ provider.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="mt-6 flex gap-3">
+                    <button type="submit" class="btn-edit text-white px-6 py-2.5 rounded-xl text-sm font-semibold flex items-center gap-2">
+                        <i class="fa-solid fa-save"></i> သိမ်းမည်
+                    </button>
+                    <button type="button" onclick="closeEditModal()" class="bg-white/10 hover:bg-white/20 text-white px-6 py-2.5 rounded-xl text-sm font-semibold transition">
+                        ပယ်ဖျက်မည်
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // ===== FILTER FUNCTIONS =====
+        let currentCategory = 'all';
+
+        function filterServices() {
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            const groups = document.querySelectorAll('.category-group');
+            
+            groups.forEach(group => {
+                const category = group.getAttribute('data-category');
+                const rows = group.querySelectorAll('.table-row');
+                let visibleRows = 0;
+                
+                rows.forEach(row => {
+                    const name = row.getAttribute('data-name') || '';
+                    const matchCategory = currentCategory === 'all' || category === currentCategory;
+                    const matchSearch = name.includes(search);
+                    if (matchCategory && matchSearch) {
+                        row.style.display = '';
+                        visibleRows++;
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+                
+                if (visibleRows === 0) {
+                    group.classList.add('hidden-group');
+                } else {
+                    group.classList.remove('hidden-group');
+                }
+            });
+        }
+
+        function filterByCategory(category, btn) {
+            currentCategory = category;
+            document.querySelectorAll('.category-filter-btn').forEach(b => b.classList.remove('active'));
+            if (btn) btn.classList.add('active');
+            filterServices();
+        }
+
+        document.getElementById('searchInput').addEventListener('input', filterServices);
+
+        // ===== DELETE SINGLE SERVICE =====
+        function deleteService(serviceId) {
+            if (!confirm('ဒီဝန်ဆောင်မှုကို ဖျက်မှာ သေချာလား?')) return;
+            
+            const btn = event.currentTarget;
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
+            
+            fetch('/admin/services/' + serviceId, { method: 'DELETE' })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        location.reload();
+                    } else {
+                        alert('❌ ' + (data.error || 'ဖျက်ရာတွင် အမှားရှိပါသည်။ (Order ရှိနေနိုင်ပါတယ်)'));
+                        btn.disabled = false;
+                        btn.innerHTML = '<i class="fa-solid fa-trash"></i>';
+                    }
+                })
+                .catch(err => {
+                    alert('❌ Error: ' + err.message);
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fa-solid fa-trash"></i>';
+                });
+        }
+
+        // ===== DELETE ALL SERVICES =====
+        function deleteAllServices() {
+            if (!confirm('⚠️ ဝန်ဆောင်မှုအားလုံးကို ဖျက်မှာ သေချာလား?\n\nဒီလုပ်ဆောင်ချက်က ပြန်မဖျက်နိုင်ပါ။')) return;
+            if (!confirm('နောက်ဆုံးအနေနဲ့ သေချာပြီလား? အကုန်ဖျက်ပစ်မှာပါ။')) return;
+
+            const msgDiv = document.getElementById('syncMessage');
+            msgDiv.className = 'mb-5 p-3 rounded-xl text-sm glass-card border border-rose-500/20 text-rose-400';
+            msgDiv.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i> ဝန်ဆောင်မှုများကို ဖျက်နေပါသည်...';
+            msgDiv.classList.remove('hidden');
+
+            fetch('/admin/services/delete-all', {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' }
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    msgDiv.className = 'mb-5 p-3 rounded-xl text-sm glass-card border border-emerald-500/20 text-emerald-400';
+                    msgDiv.innerHTML = '<i class="fa-solid fa-check-circle mr-2"></i> ' + data.message;
+                    setTimeout(() => location.reload(), 1500);
+                } else {
+                    msgDiv.className = 'mb-5 p-3 rounded-xl text-sm glass-card border border-rose-500/20 text-rose-400';
+                    msgDiv.innerHTML = '<i class="fa-solid fa-exclamation-circle mr-2"></i> ' + (data.error || 'ဖျက်ရာတွင် အမှားရှိပါသည်။ (Order ရှိနေနိုင်ပါတယ်)');
+                }
+            })
+            .catch(err => {
+                msgDiv.className = 'mb-5 p-3 rounded-xl text-sm glass-card border border-rose-500/20 text-rose-400';
+                msgDiv.innerHTML = '<i class="fa-solid fa-exclamation-circle mr-2"></i> Error: ' + err.message;
+            });
+        }
+
+        // ===== SYNC SOCPANEL =====
+        function syncSocPanelServices() {
+            if (!confirm('SocPanel မှ ဝန်ဆောင်မှုများကို ဆွဲထည့်မှာ သေချာလား?')) return;
+            const msgDiv = document.getElementById('syncMessage');
+            msgDiv.className = 'mb-5 p-3 rounded-xl text-sm glass-card border border-blue-500/20 text-blue-400';
+            msgDiv.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i> ဝန်ဆောင်မှုများကို ဆွဲထည့်နေပါသည်...';
+            msgDiv.classList.remove('hidden');
+            fetch('/admin/sync-socpanel-services', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' }
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    msgDiv.className = 'mb-5 p-3 rounded-xl text-sm glass-card border border-emerald-500/20 text-emerald-400';
+                    msgDiv.innerHTML = '<i class="fa-solid fa-check-circle mr-2"></i> ' + (data.message || 'SocPanel services synced successfully!');
+                    setTimeout(() => location.reload(), 1500);
+                } else {
+                    msgDiv.className = 'mb-5 p-3 rounded-xl text-sm glass-card border border-rose-500/20 text-rose-400';
+                    msgDiv.innerHTML = '<i class="fa-solid fa-exclamation-circle mr-2"></i> ' + (data.error || data.message || 'Sync failed!');
+                }
+            })
+            .catch(err => {
+                msgDiv.className = 'mb-5 p-3 rounded-xl text-sm glass-card border border-rose-500/20 text-rose-400';
+                msgDiv.innerHTML = '<i class="fa-solid fa-exclamation-circle mr-2"></i> Error: ' + err.message;
+            });
+        }
+
+        // ===== EDIT MODAL FUNCTIONS =====
+        function openEditModal(serviceId) {
+            // Fetch service data
+            fetch('/admin/services/' + serviceId + '/edit')
+                .then(res => res.json())
+                .then(data => {
+                    if (data.error) {
+                        alert('Error: ' + data.error);
+                        return;
+                    }
+                    // Populate form
+                    document.getElementById('editServiceId').value = data.id;
+                    document.getElementById('editName').value = data.name || '';
+                    document.getElementById('editCategory').value = data.category || '';
+                    document.getElementById('editProviderServiceId').value = data.provider_service_id || '';
+                    document.getElementById('editRate').value = data.rate || 0;
+                    document.getElementById('editMarkup').value = data.markup || 15;
+                    document.getElementById('editMinOrder').value = data.min_order || 100;
+                    document.getElementById('editMaxOrder').value = data.max_order || 100000;
+                    document.getElementById('editServiceType').value = data.service_type || 'standard';
+                    document.getElementById('editStatus').value = data.status || 'active';
+                    document.getElementById('editProviderId').value = data.provider_id || '';
+                    
+                    // Show modal
+                    document.getElementById('editModal').classList.add('active');
+                })
+                .catch(err => {
+                    alert('Error loading service data: ' + err.message);
+                });
+        }
+
+        function closeEditModal() {
+            document.getElementById('editModal').classList.remove('active');
+        }
+
+        function submitEdit(e) {
+            e.preventDefault();
+            const serviceId = document.getElementById('editServiceId').value;
+            const formData = {
+                name: document.getElementById('editName').value,
+                category: document.getElementById('editCategory').value,
+                provider_service_id: document.getElementById('editProviderServiceId').value,
+                rate: parseFloat(document.getElementById('editRate').value) || 0,
+                markup: parseFloat(document.getElementById('editMarkup').value) || 15,
+                min_order: parseInt(document.getElementById('editMinOrder').value) || 100,
+                max_order: parseInt(document.getElementById('editMaxOrder').value) || 100000,
+                service_type: document.getElementById('editServiceType').value,
+                status: document.getElementById('editStatus').value,
+                provider_id: document.getElementById('editProviderId').value || null
+            };
+
+            // Disable submit button
+            const submitBtn = document.querySelector('#editForm button[type="submit"]');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i> သိမ်းနေပါသည်...';
+
+            fetch('/admin/services/' + serviceId, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(formData)
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    closeEditModal();
+                    location.reload();
+                } else {
+                    alert('❌ Error: ' + (data.error || 'Update failed'));
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<i class="fa-solid fa-save"></i> သိမ်းမည်';
+                }
+            })
+            .catch(err => {
+                alert('Error: ' + err.message);
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fa-solid fa-save"></i> သိမ်းမည်';
+            });
+        }
+
+        // Close modal on overlay click
+        document.getElementById('editModal').addEventListener('click', function(e) {
+            if (e.target === this) closeEditModal();
+        });
+
+        // ===== INIT =====
+        document.addEventListener('DOMContentLoaded', function() {
+            filterServices();
+        });
+    </script>
+
+</body>
+</html>

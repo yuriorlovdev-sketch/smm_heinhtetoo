@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SocPanel Debug</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        pre { background: #1e293b; padding: 16px; border-radius: 12px; overflow-x: auto; font-size: 12px; color: #e2e8f0; }
+        .key-highlight { color: #60a5fa; }
+        .string-highlight { color: #34d399; }
+        .number-highlight { color: #fbbf24; }
+    </style>
+</head>
+<body class="bg-slate-950 text-white p-8">
+    <div class="max-w-7xl mx-auto">
+        <h1 class="text-3xl font-bold mb-2">🔍 SocPanel API Debug</h1>
+        <p class="text-slate-400 mb-6">Provider: <span class="text-cyan-400">{{ provider.name }}</span> (ID: {{ provider.id }})</p>
+
+        <!-- Sample Service -->
+        <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 mb-6">
+            <h2 class="text-xl font-bold mb-4 text-cyan-400">📌 ပထမဆုံး Service ရဲ့ Structure</h2>
+            {% if sample %}
+            <div class="grid grid-cols-2 gap-2 text-sm mb-4">
+                {% for key, value in sample.items() %}
+                <div class="bg-slate-800/50 p-2 rounded flex justify-between">
+                    <span class="text-slate-400">{{ key }}</span>
+                    <span class="text-white font-mono">{{ value }}</span>
+                </div>
+                {% endfor %}
+            </div>
+            <p class="text-sm text-slate-400">
+                <i class="fa-regular fa-circle-check text-emerald-400 mr-1"></i>
+                <span class="text-emerald-400">rate</span> အတွက် ဘယ် key ကိုသုံးထားလဲဆိုတာ အထက်မှာကြည့်ပါ။
+            </p>
+            {% else %}
+            <p class="text-rose-400">Service များ မတွေ့ပါ။</p>
+            {% endif %}
+        </div>
+
+        <!-- Full JSON Response -->
+        <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-6">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-bold text-cyan-400">📄 Full JSON Response</h2>
+                <span class="text-xs text-slate-500">Services Count: {{ services|length }}</span>
+            </div>
+            <pre>{{ full_response|tojson(indent=2) }}</pre>
+        </div>
+
+        <!-- Back Button -->
+        <div class="mt-6">
+            <a href="{{ url_for('admin_services') }}" class="text-cyan-400 hover:text-cyan-300 text-sm">
+                <i class="fa-solid fa-arrow-left mr-1"></i> ဝန်ဆောင်မှုများစာမျက်နှာသို့ ပြန်သွားရန်
+            </a>
+        </div>
+    </div>
+</body>
+</html>

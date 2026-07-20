@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reseller Dashboard | SMM Master</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body class="bg-slate-950 text-white">
+
+    <div class="flex h-screen">
+        <aside class="w-64 bg-slate-900 border-r border-slate-800 p-4 flex flex-col fixed h-full overflow-y-auto">
+            <div class="flex items-center gap-3 pb-6 border-b border-slate-800">
+                <div class="p-2 bg-cyan-600 rounded-lg">
+                    <i class="fa-solid fa-chart-line text-white"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-sm">Reseller Portal</h1>
+                    <p class="text-[10px] text-slate-400">{{ session.username }}</p>
+                </div>
+            </div>
+            
+            <nav class="flex-1 py-4 space-y-1">
+                <a href="{{ url_for('reseller_dashboard') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm bg-cyan-600/20 text-cyan-400">
+                    <i class="fa-solid fa-gauge"></i> ပင်မစာမျက်နှာ
+                </a>
+                <a href="{{ url_for('reseller_place_order') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm text-slate-300 hover:bg-slate-800 transition">
+                    <i class="fa-solid fa-cart-plus"></i> အမှာစာတင်မည်
+                </a>
+                <a href="{{ url_for('reseller_orders') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm text-slate-300 hover:bg-slate-800 transition">
+                    <i class="fa-solid fa-cubes"></i> ကျွန်ုပ်၏ အမှာစာများ
+                </a>
+                <a href="{{ url_for('reseller_deposit') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm text-slate-300 hover:bg-slate-800 transition">
+                    <i class="fa-solid fa-circle-dollar text-emerald-400"></i> ငွေသွင်းမည်
+                </a>
+                <a href="{{ url_for('reseller_withdraw') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm text-slate-300 hover:bg-slate-800 transition">
+                    <i class="fa-solid fa-money-bill-wave text-rose-400"></i> ငွေထုတ်မည်
+                </a>
+                <a href="{{ url_for('reseller_tickets') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm text-slate-300 hover:bg-slate-800 transition">
+                    <i class="fa-solid fa-envelope-open-text"></i> အကူအညီ
+                </a>
+            </nav>
+            
+            <div class="border-t border-slate-800 pt-4">
+                <a href="{{ url_for('logout') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm text-rose-400 hover:bg-rose-950/30 transition">
+                    <i class="fa-solid fa-right-from-bracket"></i> ထွက်မည်
+                </a>
+            </div>
+        </aside>
+
+        <main class="flex-1 p-6 ml-64 overflow-y-auto">
+            <h2 class="text-2xl font-bold mb-6">📊 Reseller Dashboard</h2>
+
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-5">
+                    <p class="text-xs text-slate-400 uppercase">လက်ကျန်ငွေ</p>
+                    <p class="text-2xl font-bold text-cyan-400">{{ "%.0f"|format(user.balance) }} MMK</p>
+                </div>
+                <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-5">
+                    <p class="text-xs text-slate-400 uppercase">စုစုပေါင်းအမှာစာ</p>
+                    <p class="text-2xl font-bold text-white">{{ total_orders }}</p>
+                </div>
+                <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-5">
+                    <p class="text-xs text-slate-400 uppercase">ဆောင်ရွက်ဆဲ</p>
+                    <p class="text-2xl font-bold text-amber-400">{{ pending_orders }}</p>
+                </div>
+                <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-5">
+                    <p class="text-xs text-slate-400 uppercase">ပြီးစီးခဲ့</p>
+                    <p class="text-2xl font-bold text-emerald-400">{{ total_orders - pending_orders }}</p>
+                </div>
+            </div>
+
+            <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-6">
+                <h3 class="text-lg font-bold mb-4">🕐 မကြာသေးမီက အမှာစာများ</h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm">
+                        <thead>
+                            <tr class="text-left text-slate-400 border-b border-slate-800">
+                                <th class="pb-2">ID</th>
+                                <th class="pb-2">ဝန်ဆောင်မှု</th>
+                                <th class="pb-2">အရေအတွက်</th>
+                                <th class="pb-2 text-right">ဈေးနှုန်း</th>
+                                <th class="pb-2 text-center">အခြေအနေ</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for order in recent_orders %}
+                            <tr class="border-b border-slate-800/50">
+                                <td class="py-2 font-mono text-xs text-slate-400">#{{ order.id }}</td>
+                                <td class="py-2">{{ order.service_name }}</td>
+                                <td class="py-2">{{ order.quantity }}</td>
+                                <td class="py-2 text-right">{{ "%.0f"|format(order.price) }} MMK</td>
+                                <td class="py-2 text-center">
+                                    <span class="px-2 py-1 rounded text-xs font-semibold 
+                                        {% if order.status == 'completed' %}bg-emerald-500/20 text-emerald-400
+                                        {% elif order.status == 'pending' %}bg-amber-500/20 text-amber-400
+                                        {% else %}bg-blue-500/20 text-blue-400{% endif %}">
+                                        {{ order.status }}
+                                    </span>
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="5" class="py-4 text-center text-slate-500">အမှာစာများ မရှိသေးပါ</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+</body>
+</html>

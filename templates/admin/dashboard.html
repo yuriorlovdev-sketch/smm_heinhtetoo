@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | SMM Master</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .chart-container { position: relative; height: 250px; width: 100%; }
+        .summary-card { transition: transform 0.2s, box-shadow 0.2s; }
+        .summary-card:hover { transform: translateY(-4px); box-shadow: 0 8px 25px rgba(0,0,0,0.3); }
+    </style>
+</head>
+<body class="bg-slate-950 text-white">
+
+    <div class="flex h-screen">
+        <!-- Sidebar (အတူတူ) -->
+        <aside class="w-64 bg-slate-900 border-r border-slate-800 p-4 flex flex-col fixed h-full overflow-y-auto">
+            <div class="flex items-center gap-3 pb-6 border-b border-slate-800">
+                <div class="p-2 bg-violet-600 rounded-lg">
+                    <i class="fa-solid fa-screwdriver-wrench text-white"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-sm">SMM Admin</h1>
+                    <p class="text-[10px] text-slate-400">{{ session.username }}</p>
+                </div>
+            </div>
+            <nav class="flex-1 py-4 space-y-1">
+                <a href="{{ url_for('admin_dashboard') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm bg-violet-600/20 text-violet-400">
+                    <i class="fa-solid fa-gauge"></i> Dashboard
+                </a>
+                <a href="{{ url_for('admin_users') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm text-slate-300 hover:bg-slate-800 transition">
+                    <i class="fa-solid fa-users"></i> သုံးစွဲသူများ
+                </a>
+                <a href="{{ url_for('admin_orders') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm text-slate-300 hover:bg-slate-800 transition">
+                    <i class="fa-solid fa-cubes"></i> အမှာစာများ
+                </a>
+                <a href="{{ url_for('admin_services') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm text-slate-300 hover:bg-slate-800 transition">
+                    <i class="fa-solid fa-list"></i> ဝန်ဆောင်မှုများ
+                </a>
+                <a href="{{ url_for('admin_providers') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm text-slate-300 hover:bg-slate-800 transition">
+                    <i class="fa-solid fa-plug"></i> Providers
+                </a>
+                <a href="{{ url_for('admin_payment_methods') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm text-slate-300 hover:bg-slate-800 transition">
+                    <i class="fa-solid fa-wallet text-emerald-400"></i> ငွေသွင်းနည်းလမ်းများ
+                </a>
+                <a href="{{ url_for('admin_payments') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm text-slate-300 hover:bg-slate-800 transition">
+                    <i class="fa-solid fa-circle-dollar"></i> ငွေသွင်းလျှောက်လွှာများ
+                </a>
+                <a href="{{ url_for('admin_withdraws') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm text-slate-300 hover:bg-slate-800 transition">
+                    <i class="fa-solid fa-money-bill-wave text-rose-400"></i> ငွေထုတ်
+                </a>
+                <a href="{{ url_for('admin_tickets') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm text-slate-300 hover:bg-slate-800 transition">
+                    <i class="fa-solid fa-envelope-open-text"></i> အကူအညီတောင်းများ
+                </a>
+                <a href="{{ url_for('admin_settings') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm text-slate-300 hover:bg-slate-800 transition">
+                    <i class="fa-solid fa-gear"></i> စနစ်ပြင်ဆင်မှု
+                </a>
+            </nav>
+            <div class="border-t border-slate-800 pt-4">
+                <a href="{{ url_for('logout') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm text-rose-400 hover:bg-rose-950/30 transition">
+                    <i class="fa-solid fa-right-from-bracket"></i> ထွက်မည်
+                </a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 p-6 ml-64 overflow-y-auto">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold">📊 Admin Dashboard – SocPanel စာရင်းဇယား</h2>
+                <div class="text-sm text-slate-400">
+                    <i class="fa-regular fa-clock mr-1"></i> {{ now.strftime('%Y-%m-%d %H:%M') }}
+                </div>
+            </div>
+
+            <!-- ===== SOCPANEL SUMMARY CARDS ===== -->
+            <h3 class="text-lg font-bold mb-3 text-violet-400">📌 SocPanel စုစုပေါင်း အချက်အလက်များ</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 summary-card">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-xs text-slate-400 uppercase">စုစုပေါင်းအမှာစာ</p>
+                            <p class="text-2xl font-bold text-white">{{ socpanel_summary.total_orders }}</p>
+                        </div>
+                        <div class="p-3 bg-blue-500/20 rounded-xl">
+                            <i class="fa-solid fa-cubes text-blue-400 text-xl"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 summary-card">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-xs text-slate-400 uppercase">စုစုပေါင်းရောင်းစျေး (Revenue)</p>
+                            <p class="text-2xl font-bold text-emerald-400">{{ "%.0f"|format(socpanel_summary.total_revenue) }} MMK</p>
+                        </div>
+                        <div class="p-3 bg-emerald-500/20 rounded-xl">
+                            <i class="fa-solid fa-circle-dollar text-emerald-400 text-xl"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 summary-card">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-xs text-slate-400 uppercase">စုစုပေါင်းဝယ်စျေး (Cost)</p>
+                            <p class="text-2xl font-bold text-rose-400">{{ "%.0f"|format(socpanel_summary.total_cost_mmk) }} MMK</p>
+                            <p class="text-xs text-slate-500">${{ "%.2f"|format(socpanel_summary.total_cost_usd) }}</p>
+                        </div>
+                        <div class="p-3 bg-rose-500/20 rounded-xl">
+                            <i class="fa-solid fa-arrow-trend-down text-rose-400 text-xl"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 summary-card">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-xs text-slate-400 uppercase">စုစုပေါင်းအမြတ်</p>
+                            <p class="text-2xl font-bold text-amber-400">{{ "%.0f"|format(socpanel_summary.total_profit) }} MMK</p>
+                            <p class="text-xs text-emerald-400">Margin: {{ "%.1f"|format(socpanel_summary.profit_percent) }}%</p>
+                        </div>
+                        <div class="p-3 bg-amber-500/20 rounded-xl">
+                            <i class="fa-solid fa-coins text-amber-400 text-xl"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== SOCPANEL MONTHLY & YEARLY CHARTS ===== -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-6">
+                    <h3 class="text-lg font-bold mb-4">📈 လစဉ်ဝင်ငွေ၊ ထွက်ငွေနှင့်အမြတ် (SocPanel – MMK)</h3>
+                    <div class="chart-container"><canvas id="socpanelMonthlyChart"></canvas></div>
+                </div>
+                <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-6">
+                    <h3 class="text-lg font-bold mb-4">📊 နှစ်အလိုက်ဝင်ငွေ၊ ထွက်ငွေနှင့်အမြတ် (SocPanel – MMK)</h3>
+                    <div class="chart-container"><canvas id="socpanelYearlyChart"></canvas></div>
+                </div>
+            </div>
+
+            <!-- ===== SOCPANEL RECENT ORDERS TABLE ===== -->
+            <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-6">
+                <h3 class="text-lg font-bold mb-4">🕐 SocPanel မှ မကြာသေးမီက အမှာစာများ</h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm">
+                        <thead>
+                            <tr class="text-left text-slate-400 border-b border-slate-800">
+                                <th class="pb-2">ID</th>
+                                <th class="pb-2">ဝန်ဆောင်မှု</th>
+                                <th class="pb-2">သုံးစွဲသူ</th>
+                                <th class="pb-2 text-right">ရောင်းစျေး (MMK)</th>
+                                <th class="pb-2 text-right">ဝယ်စျေး (USD)</th>
+                                <th class="pb-2 text-right">ဝယ်စျေး (MMK)</th>
+                                <th class="pb-2 text-right">အမြတ် (MMK)</th>
+                                <th class="pb-2 text-right">အမြတ် (%)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for order in socpanel_recent %}
+                            <tr class="border-b border-slate-800/50 hover:bg-slate-800/30">
+                                <td class="py-2 font-mono text-xs text-slate-400">#{{ order.id }}</td>
+                                <td class="py-2">{{ order.service_name[:20] }}{% if order.service_name|length > 20 %}...{% endif %}</td>
+                                <td class="py-2">{{ order.user_name }}</td>
+                                <td class="py-2 text-right text-emerald-400">{{ "%.0f"|format(order.price) }}</td>
+                                <td class="py-2 text-right text-rose-400">${{ "%.2f"|format(order.cost) }}</td>
+                                <td class="py-2 text-right text-rose-400">{{ "%.0f"|format(order.cost_mmk) }}</td>
+                                <td class="py-2 text-right text-amber-400">{{ "%.0f"|format(order.profit) }}</td>
+                                <td class="py-2 text-right text-slate-300">
+                                    {% if order.profit_percent > 0 %}
+                                        <span class="text-emerald-400">{{ "%.1f"|format(order.profit_percent) }}%</span>
+                                    {% else %}
+                                        <span class="text-rose-400">{{ "%.1f"|format(order.profit_percent) }}%</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="8" class="py-4 text-center text-slate-500">SocPanel အမှာစာများ မရှိသေးပါ</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                        <!-- ===== FOOTER: SUMMARY FOR RECENT ORDERS ===== -->
+                        {% if socpanel_recent %}
+                        <tfoot>
+                            <tr class="border-t-2 border-slate-700 font-semibold bg-slate-800/30">
+                                <td colspan="3" class="py-2 text-right text-slate-300">စုစုပေါင်း</td>
+                                <td class="py-2 text-right text-emerald-400">
+                                    {{ "%.0f"|format(socpanel_recent|sum(attribute='price')) }}
+                                </td>
+                                <td class="py-2 text-right text-rose-400">
+                                    ${{ "%.2f"|format(socpanel_recent|sum(attribute='cost')) }}
+                                </td>
+                                <td class="py-2 text-right text-rose-400">
+                                    {{ "%.0f"|format(socpanel_recent|sum(attribute='cost_mmk')) }}
+                                </td>
+                                <td class="py-2 text-right text-amber-400">
+                                    {{ "%.0f"|format(socpanel_recent|sum(attribute='profit')) }}
+                                </td>
+                                <td class="py-2 text-right text-emerald-400">
+                                    {% set total_recent_cost = socpanel_recent|sum(attribute='cost_mmk') %}
+                                    {% set total_recent_profit = socpanel_recent|sum(attribute='profit') %}
+                                    {% if total_recent_cost > 0 %}
+                                        {{ "%.1f"|format((total_recent_profit / total_recent_cost) * 100) }}%
+                                    {% else %}
+                                        0%
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        </tfoot>
+                        {% endif %}
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // ===== SocPanel Monthly Chart =====
+            const monthlyCtx = document.getElementById('socpanelMonthlyChart').getContext('2d');
+            new Chart(monthlyCtx, {
+                type: 'bar',
+                data: {
+                    labels: {{ socpanel_months|safe }},
+                    datasets: [
+                        {
+                            label: 'ဝင်ငွေ (MMK)',
+                            data: {{ socpanel_monthly_revenue|safe }},
+                            backgroundColor: 'rgba(52, 211, 153, 0.7)',
+                            borderColor: 'rgba(52, 211, 153, 1)',
+                            borderWidth: 1,
+                            yAxisID: 'y',
+                        },
+                        {
+                            label: 'ထွက်ငွေ/ကုန်ကျ (MMK)',
+                            data: {{ socpanel_monthly_cost|safe }},
+                            backgroundColor: 'rgba(244, 63, 94, 0.7)',
+                            borderColor: 'rgba(244, 63, 94, 1)',
+                            borderWidth: 1,
+                            yAxisID: 'y',
+                        },
+                        {
+                            label: 'အမြတ် (MMK)',
+                            data: {{ socpanel_monthly_profit|safe }},
+                            backgroundColor: 'rgba(251, 191, 36, 0.7)',
+                            borderColor: 'rgba(251, 191, 36, 1)',
+                            borderWidth: 1,
+                            yAxisID: 'y',
+                        },
+                        {
+                            label: 'အမှာစာအရေအတွက်',
+                            data: {{ socpanel_monthly_orders|safe }},
+                            type: 'line',
+                            borderColor: 'rgba(96, 165, 250, 1)',
+                            backgroundColor: 'rgba(96, 165, 250, 0.1)',
+                            pointBorderColor: 'rgba(96, 165, 250, 1)',
+                            pointBackgroundColor: 'rgba(96, 165, 250, 0.7)',
+                            borderWidth: 2,
+                            fill: false,
+                            yAxisID: 'y1',
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: { mode: 'index', intersect: false },
+                    plugins: { legend: { labels: { color: '#94a3b8' } } },
+                    scales: {
+                        y: { beginAtZero: true, position: 'left', ticks: { color: '#94a3b8' } },
+                        y1: { beginAtZero: true, position: 'right', grid: { drawOnChartArea: false }, ticks: { color: '#94a3b8' } },
+                        x: { ticks: { color: '#94a3b8' } }
+                    }
+                }
+            });
+
+            // ===== SocPanel Yearly Chart =====
+            const yearlyCtx = document.getElementById('socpanelYearlyChart').getContext('2d');
+            new Chart(yearlyCtx, {
+                type: 'line',
+                data: {
+                    labels: {{ socpanel_years|safe }},
+                    datasets: [
+                        {
+                            label: 'ဝင်ငွေ (MMK)',
+                            data: {{ socpanel_yearly_revenue|safe }},
+                            borderColor: 'rgba(52, 211, 153, 1)',
+                            backgroundColor: 'rgba(52, 211, 153, 0.1)',
+                            fill: true,
+                            tension: 0.2,
+                            pointBackgroundColor: 'rgba(52, 211, 153, 1)',
+                        },
+                        {
+                            label: 'ထွက်ငွေ/ကုန်ကျ (MMK)',
+                            data: {{ socpanel_yearly_cost|safe }},
+                            borderColor: 'rgba(244, 63, 94, 1)',
+                            backgroundColor: 'rgba(244, 63, 94, 0.1)',
+                            fill: true,
+                            tension: 0.2,
+                            pointBackgroundColor: 'rgba(244, 63, 94, 1)',
+                        },
+                        {
+                            label: 'အမြတ် (MMK)',
+                            data: {{ socpanel_yearly_profit|safe }},
+                            borderColor: 'rgba(251, 191, 36, 1)',
+                            backgroundColor: 'rgba(251, 191, 36, 0.1)',
+                            fill: true,
+                            tension: 0.2,
+                            pointBackgroundColor: 'rgba(251, 191, 36, 1)',
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { labels: { color: '#94a3b8' } } },
+                    scales: {
+                        y: { beginAtZero: true, ticks: { color: '#94a3b8' } },
+                        x: { ticks: { color: '#94a3b8' } }
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>

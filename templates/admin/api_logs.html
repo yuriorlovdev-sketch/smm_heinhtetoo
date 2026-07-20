@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Logs | SMM Master</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body class="bg-slate-950 text-white">
+
+    <div class="flex h-screen">
+        <aside class="w-64 bg-slate-900 border-r border-slate-800 p-4 flex flex-col fixed h-full overflow-y-auto">
+            <div class="flex items-center gap-3 pb-6 border-b border-slate-800">
+                <div class="p-2 bg-violet-600 rounded-lg">
+                    <i class="fa-solid fa-screwdriver-wrench text-white"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-sm">SMM Admin</h1>
+                    <p class="text-[10px] text-slate-400">{{ session.username }}</p>
+                </div>
+            </div>
+            
+            <nav class="flex-1 py-4 space-y-1">
+                <a href="{{ url_for('admin_dashboard') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm text-slate-300 hover:bg-slate-800 transition">
+                    <i class="fa-solid fa-gauge"></i> Dashboard
+                </a>
+                <a href="{{ url_for('admin_users') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm text-slate-300 hover:bg-slate-800 transition">
+                    <i class="fa-solid fa-users"></i> သုံးစွဲသူများ
+                </a>
+                <a href="{{ url_for('admin_orders') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm text-slate-300 hover:bg-slate-800 transition">
+                    <i class="fa-solid fa-cubes"></i> အမှာစာများ
+                </a>
+                <a href="{{ url_for('admin_services') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm text-slate-300 hover:bg-slate-800 transition">
+                    <i class="fa-solid fa-list"></i> ဝန်ဆောင်မှုများ
+                </a>
+                <a href="{{ url_for('admin_payments') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm text-slate-300 hover:bg-slate-800 transition">
+                    <i class="fa-solid fa-circle-dollar text-emerald-400"></i> ငွေသွင်း
+                </a>
+                <a href="{{ url_for('admin_withdraws') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm text-slate-300 hover:bg-slate-800 transition">
+                    <i class="fa-solid fa-money-bill-wave text-rose-400"></i> ငွေထုတ်
+                </a>
+                <a href="{{ url_for('admin_providers') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm text-slate-300 hover:bg-slate-800 transition">
+                    <i class="fa-solid fa-plug"></i> API Providers
+                </a>
+                <a href="{{ url_for('admin_reseller_apis') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm text-slate-300 hover:bg-slate-800 transition">
+                    <i class="fa-solid fa-key"></i> Reseller APIs
+                </a>
+                <a href="{{ url_for('admin_api_logs') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm bg-violet-600/20 text-violet-400">
+                    <i class="fa-solid fa-clock-rotate-left"></i> API Logs
+                </a>
+                <a href="{{ url_for('admin_settings') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm text-slate-300 hover:bg-slate-800 transition">
+                    <i class="fa-solid fa-gear"></i> စနစ်ပြင်ဆင်မှု
+                </a>
+            </nav>
+            
+            <div class="border-t border-slate-800 pt-4">
+                <a href="{{ url_for('logout') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm text-rose-400 hover:bg-rose-950/30 transition">
+                    <i class="fa-solid fa-right-from-bracket"></i> ထွက်မည်
+                </a>
+            </div>
+        </aside>
+
+        <main class="flex-1 p-6 ml-64 overflow-y-auto">
+            <h2 class="text-2xl font-bold mb-6">📊 API ခေါ်ဆိုမှုမှတ်တမ်းများ</h2>
+
+            <div class="bg-slate-900/80 border border-slate-800 rounded-2xl overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left">
+                        <thead class="bg-slate-800/50 text-xs text-slate-400 uppercase tracking-wider">
+                            <tr>
+                                <th class="px-4 py-3">ID</th>
+                                <th class="px-4 py-3">Provider</th>
+                                <th class="px-4 py-3">Endpoint</th>
+                                <th class="px-4 py-3">Method</th>
+                                <th class="px-4 py-3 text-center">Status</th>
+                                <th class="px-4 py-3">Request</th>
+                                <th class="px-4 py-3">Response</th>
+                                <th class="px-4 py-3">အချိန်</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-800/50">
+                            {% for log in logs %}
+                            <tr>
+                                <td class="px-4 py-3 font-mono text-xs text-slate-400">#{{ log.id }}</td>
+                                <td class="px-4 py-3 text-sm">{{ log.provider_name or 'N/A' }}</td>
+                                <td class="px-4 py-3 text-xs text-slate-300">{{ log.endpoint }}</td>
+                                <td class="px-4 py-3 text-xs font-mono">{{ log.method }}</td>
+                                <td class="px-4 py-3 text-center">
+                                    <span class="px-2 py-1 rounded text-xs font-semibold 
+                                        {% if log.status_code >= 200 and log.status_code < 300 %}bg-emerald-500/20 text-emerald-400
+                                        {% else %}bg-rose-500/20 text-rose-400{% endif %}">
+                                        {{ log.status_code }}
+                                    </span>
+                                </td>
+                                <td class="px-4 py-3 text-xs text-slate-400 truncate max-w-[100px]">{{ log.request[:50] }}...</td>
+                                <td class="px-4 py-3 text-xs text-slate-400 truncate max-w-[100px]">{{ log.response[:50] }}...</td>
+                                <td class="px-4 py-3 text-xs text-slate-400">{{ log.created_at[:10] }}<br>{{ log.created_at[11:16] }}</td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="8" class="px-4 py-8 text-center text-slate-500">API ခေါ်ဆိုမှုများ မရှိသေးပါ</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+</body>
+</html>

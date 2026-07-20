@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Broadcast | SMM Master</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body class="bg-slate-950 text-white">
+
+    <div class="flex h-screen">
+        <aside class="w-64 bg-slate-900 border-r border-slate-800 p-4 flex flex-col fixed h-full overflow-y-auto">
+            <div class="flex items-center gap-3 pb-6 border-b border-slate-800">
+                <div class="p-2 bg-violet-600 rounded-lg">
+                    <i class="fa-solid fa-screwdriver-wrench text-white"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-sm">SMM Admin</h1>
+                    <p class="text-[10px] text-slate-400">{{ session.username }}</p>
+                </div>
+            </div>
+            
+            <nav class="flex-1 py-4 space-y-1">
+                <a href="{{ url_for('admin_dashboard') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm text-slate-300 hover:bg-slate-800 transition">
+                    <i class="fa-solid fa-gauge"></i> Dashboard
+                </a>
+                <a href="{{ url_for('admin_users') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm text-slate-300 hover:bg-slate-800 transition">
+                    <i class="fa-solid fa-users"></i> သုံးစွဲသူများ
+                </a>
+                <a href="{{ url_for('admin_orders') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm text-slate-300 hover:bg-slate-800 transition">
+                    <i class="fa-solid fa-cubes"></i> အမှာစာများ
+                </a>
+                <a href="{{ url_for('admin_services') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm text-slate-300 hover:bg-slate-800 transition">
+                    <i class="fa-solid fa-list"></i> ဝန်ဆောင်မှုများ
+                </a>
+                <a href="{{ url_for('admin_payment_methods') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm text-slate-300 hover:bg-slate-800 transition">
+                    <i class="fa-solid fa-wallet text-emerald-400"></i> ငွေသွင်းနည်းလမ်းများ
+                </a>
+                <a href="{{ url_for('admin_payments') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm text-slate-300 hover:bg-slate-800 transition">
+                    <i class="fa-solid fa-circle-dollar"></i> ငွေသွင်းလျှောက်လွှာများ
+                </a>
+                <a href="{{ url_for('admin_withdraws') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm text-slate-300 hover:bg-slate-800 transition">
+                    <i class="fa-solid fa-money-bill-wave text-rose-400"></i> ငွေထုတ်
+                </a>
+                <a href="{{ url_for('admin_tickets') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm text-slate-300 hover:bg-slate-800 transition">
+                    <i class="fa-solid fa-envelope-open-text"></i> အကူအညီတောင်းများ
+                </a>
+                <a href="{{ url_for('admin_settings') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm text-slate-300 hover:bg-slate-800 transition">
+                    <i class="fa-solid fa-gear"></i> စနစ်ပြင်ဆင်မှု
+                </a>
+            </nav>
+            
+            <div class="border-t border-slate-800 pt-4">
+                <a href="{{ url_for('logout') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm text-rose-400 hover:bg-rose-950/30 transition">
+                    <i class="fa-solid fa-right-from-bracket"></i> ထွက်မည်
+                </a>
+            </div>
+        </aside>
+
+        <main class="flex-1 p-6 ml-64 overflow-y-auto">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold">📢 Broadcast ပို့မည်</h2>
+                <a href="{{ url_for('admin_tickets') }}" class="bg-slate-700 hover:bg-slate-600 text-white px-4 py-2 rounded-lg text-sm transition">
+                    <i class="fa-solid fa-arrow-left"></i> ပြန်သွား
+                </a>
+            </div>
+
+            <div class="bg-amber-500/10 border border-amber-500/30 rounded-2xl p-4 mb-6">
+                <p class="text-amber-400 text-sm flex items-center gap-2">
+                    <i class="fa-solid fa-info-circle"></i>
+                    ဤမက်ဆေ့ခ်ျကို ရွေးချယ်ထားသော သုံးစွဲသူအားလုံးထံသို့ Ticket အဖြစ် ပို့ဆောင်ပေးမည်။
+                </p>
+            </div>
+
+            <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 max-w-2xl">
+                <form method="POST" class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-400 uppercase mb-1">ပို့ရန် သုံးစွဲသူများ *</label>
+                        <select name="send_to" required class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white outline-none focus:ring-2 focus:ring-amber-500">
+                            <option value="all">အားလုံး (All Users)</option>
+                            <option value="reseller">ကိုယ်စားလှယ်များ (Resellers)</option>
+                            <option value="user">သုံးစွဲသူများ (Users)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-400 uppercase mb-1">ခေါင်းစဉ် *</label>
+                        <input type="text" name="subject" required placeholder="Broadcast ခေါင်းစဉ်" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white outline-none focus:ring-2 focus:ring-amber-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-400 uppercase mb-1">မက်ဆေ့ခ်ျ *</label>
+                        <textarea name="message" required rows="6" placeholder="သုံးစွဲသူအားလုံးထံ ပို့လိုသော အကြောင်းအရာ..." class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white outline-none focus:ring-2 focus:ring-amber-500"></textarea>
+                    </div>
+                    <button type="submit" class="w-full bg-amber-600 hover:bg-amber-500 text-white font-bold py-3 rounded-xl transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-bullhorn"></i> Broadcast ပို့မည်
+                    </button>
+                </form>
+            </div>
+
+            <div class="mt-6 bg-slate-900/80 border border-slate-800 rounded-2xl p-4">
+                <h4 class="text-sm font-bold text-slate-300 mb-2">📌 သတိပြုရန်</h4>
+                <ul class="text-xs text-slate-400 space-y-1 list-disc list-inside">
+                    <li>Broadcast ကို Ticket အဖြစ် သုံးစွဲသူတိုင်း၏ Inbox ထဲသို့ ပို့ဆောင်ပေးမည်</li>
+                    <li>သုံးစွဲသူများက သူတို့၏ Ticket စာမျက်နှာတွင် ကြည့်ရှုနိုင်မည်</li>
+                    <li>သုံးစွဲသူများက ပြန်လည်ဖြေကြားနိုင်မည်</li>
+                    <li>ဤလုပ်ဆောင်ချက်ကို ပြန်လည်ရုပ်သိမ်း၍ မရနိုင်ပါ</li>
+                </ul>
+            </div>
+        </main>
+    </div>
+</body>
+</html>

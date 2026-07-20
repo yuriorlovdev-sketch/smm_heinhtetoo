@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Orders | SMM Admin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        * { font-family: 'Inter', sans-serif; }
+        body { background: #0a0a0f; }
+        .gradient-bg {
+            background: radial-gradient(ellipse at 20% 50%, rgba(88, 28, 135, 0.08) 0%, transparent 60%),
+                        radial-gradient(ellipse at 80% 50%, rgba(15, 23, 42, 0.8) 0%, #0a0a0f 100%);
+            min-height: 100vh;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.02);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            overflow: hidden;
+            transition: border-color 0.3s ease;
+        }
+        .glass-card:hover {
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+        .table-header {
+            background: rgba(255, 255, 255, 0.03);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+        }
+        .table-row {
+            transition: background 0.15s ease;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+        }
+        .table-row:hover {
+            background: rgba(255, 255, 255, 0.03);
+        }
+        .search-box {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 12px;
+            padding: 10px 16px 10px 40px;
+            color: white;
+            width: 100%;
+            max-width: 280px;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+        .search-box:focus {
+            outline: none;
+            border-color: rgba(139, 92, 246, 0.4);
+            box-shadow: 0 0 20px rgba(139, 92, 246, 0.06);
+            background: rgba(255, 255, 255, 0.06);
+        }
+        .search-box::placeholder { color: rgba(255, 255, 255, 0.25); }
+        .status-filter {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 12px;
+            padding: 10px 16px 10px 16px;
+            color: white;
+            min-width: 150px;
+            transition: all 0.3s ease;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='rgba(255,255,255,0.3)' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 16px center;
+            padding-right: 40px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .status-filter:focus { outline: none; border-color: rgba(139, 92, 246, 0.4); }
+        .status-filter option { background: #1a1a2e; color: white; }
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            white-space: nowrap;
+        }
+        .status-badge .dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+        .status-badge.completed { background: rgba(16, 185, 129, 0.12); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.12); }
+        .status-badge.completed .dot { background: #34d399; }
+        .status-badge.pending { background: rgba(251, 191, 36, 0.12); color: #fbbf24; border: 1px solid rgba(251, 191, 36, 0.12); }
+        .status-badge.pending .dot { background: #fbbf24; }
+        .status-badge.processing { background: rgba(59, 130, 246, 0.12); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.12); }
+        .status-badge.processing .dot { background: #60a5fa; animation: pulse 1.5s infinite; }
+        .status-badge.canceled { background: rgba(244, 63, 94, 0.12); color: #fb7185; border: 1px solid rgba(244, 63, 94, 0.12); }
+        .status-badge.canceled .dot { background: #fb7185; }
+        .status-badge.failed { background: rgba(239, 68, 68, 0.12); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.12); }
+        .status-badge.failed .dot { background: #f87171; }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+        .action-btn {
+            padding: 6px 10px;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            color: rgba(255, 255, 255, 0.5);
+            cursor: pointer;
+            font-size: 12px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .action-btn:hover {
+            background: rgba(255, 255, 255, 0.08);
+        }
+        .action-btn.sync:hover { border-color: rgba(251, 191, 36, 0.3); color: #fbbf24; }
+        .action-btn.delete:hover { border-color: rgba(239, 68, 68, 0.3); color: #f87171; }
+        .status-select {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 8px;
+            padding: 4px 8px;
+            color: white;
+            font-size: 11px;
+            cursor: pointer;
+            appearance: none;
+            padding-right: 24px;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'%3E%3Cpath fill='rgba(255,255,255,0.3)' d='M5 7L1 3h8z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 6px center;
+            transition: border-color 0.2s;
+        }
+        .status-select:focus { outline: none; border-color: rgba(139,92,246,0.4); }
+        .status-select option { background: #1a1a2e; color: white; }
+        .profit-positive { color: #34d399; font-weight: 600; }
+        .profit-negative { color: #fb7185; font-weight: 600; }
+        .link-text {
+            max-width: 120px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            display: inline-block;
+            color: rgba(255,255,255,0.4);
+            font-size: 12px;
+            transition: color 0.2s;
+        }
+        .link-text:hover { color: rgba(255,255,255,0.8); }
+        .service-name {
+            font-weight: 500;
+            font-size: 13px;
+            color: white;
+        }
+        .service-category {
+            font-size: 10px;
+            color: rgba(255,255,255,0.25);
+            margin-top: 2px;
+        }
+        .order-id {
+            font-family: monospace;
+            font-size: 12px;
+            color: rgba(255,255,255,0.3);
+        }
+        .refresh-btn {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 12px;
+            padding: 8px 16px;
+            color: rgba(255,255,255,0.6);
+            transition: all 0.2s;
+            cursor: pointer;
+            font-size: 13px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .refresh-btn:hover {
+            background: rgba(255,255,255,0.08);
+            color: white;
+        }
+        .reset-btn {
+            background: transparent;
+            border: none;
+            color: rgba(255,255,255,0.3);
+            font-size: 13px;
+            cursor: pointer;
+            transition: color 0.2s;
+            padding: 8px 12px;
+        }
+        .reset-btn:hover { color: white; }
+        .message-box {
+            border-radius: 12px;
+            padding: 12px 16px;
+            font-size: 13px;
+            display: none;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+        .message-box.success { background: rgba(16,185,129,0.08); border: 1px solid rgba(16,185,129,0.15); color: #34d399; }
+        .message-box.error { background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.15); color: #f87171; }
+        .message-box.info { background: rgba(59,130,246,0.08); border: 1px solid rgba(59,130,246,0.15); color: #60a5fa; }
+        .message-box.show { display: flex; }
+        ::-webkit-scrollbar { width: 4px; height: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(139, 92, 246, 0.3); border-radius: 10px; }
+        .text-gradient { background: linear-gradient(135deg, #a78bfa, #818cf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .table-wrap { overflow-x: auto; padding: 2px; }
+    </style>
+</head>
+<body>
+
+    <div class="flex h-screen overflow-hidden">
+        <!-- Sidebar (Standard) -->
+        <aside class="w-64 bg-black/40 backdrop-blur-sm border-r border-white/5 p-4 flex flex-col fixed h-full overflow-y-auto z-10">
+            <div class="flex items-center gap-3 pb-6 border-b border-white/5">
+                <div class="p-2.5 bg-gradient-to-br from-violet-600 to-indigo-600 rounded-xl shadow-lg shadow-violet-500/25">
+                    <i class="fa-solid fa-screwdriver-wrench text-white text-sm"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-sm tracking-wide text-white">SMM Admin</h1>
+                    <p class="text-[10px] text-white/40">{{ session.username }}</p>
+                </div>
+            </div>
+            <nav class="flex-1 py-5 space-y-1">
+                <a href="{{ url_for('admin_dashboard') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm text-white/60 hover:bg-white/5 transition-all hover:text-white">
+                    <i class="fa-solid fa-gauge w-4"></i> Dashboard
+                </a>
+                <a href="{{ url_for('admin_users') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm text-white/60 hover:bg-white/5 transition-all hover:text-white">
+                    <i class="fa-solid fa-users w-4"></i> သုံးစွဲသူများ
+                </a>
+                <a href="{{ url_for('admin_orders') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm bg-violet-600/20 text-violet-400 border border-violet-500/20">
+                    <i class="fa-solid fa-cubes w-4"></i> အမှာစာများ
+                </a>
+                <a href="{{ url_for('admin_services') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm text-white/60 hover:bg-white/5 transition-all hover:text-white">
+                    <i class="fa-solid fa-list w-4"></i> ဝန်ဆောင်မှုများ
+                </a>
+                <a href="{{ url_for('admin_providers') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm text-white/60 hover:bg-white/5 transition-all hover:text-white">
+                    <i class="fa-solid fa-plug w-4"></i> Providers
+                </a>
+                <a href="{{ url_for('admin_payment_methods') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm text-white/60 hover:bg-white/5 transition-all hover:text-white">
+                    <i class="fa-solid fa-wallet text-emerald-400 w-4"></i> ငွေသွင်းနည်းလမ်းများ
+                </a>
+                <a href="{{ url_for('admin_payments') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm text-white/60 hover:bg-white/5 transition-all hover:text-white">
+                    <i class="fa-solid fa-circle-dollar w-4"></i> ငွေသွင်းလျှောက်လွှာများ
+                </a>
+                <a href="{{ url_for('admin_withdraws') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm text-white/60 hover:bg-white/5 transition-all hover:text-white">
+                    <i class="fa-solid fa-money-bill-wave text-rose-400 w-4"></i> ငွေထုတ်
+                </a>
+                <a href="{{ url_for('admin_tickets') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm text-white/60 hover:bg-white/5 transition-all hover:text-white">
+                    <i class="fa-solid fa-envelope-open-text w-4"></i> အကူအညီတောင်းများ
+                </a>
+                <a href="{{ url_for('admin_settings') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm text-white/60 hover:bg-white/5 transition-all hover:text-white">
+                    <i class="fa-solid fa-gear w-4"></i> စနစ်ပြင်ဆင်မှု
+                </a>
+            </nav>
+            <div class="border-t border-white/5 pt-4">
+                <a href="{{ url_for('logout') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm text-rose-400 hover:bg-rose-500/10 transition-all">
+                    <i class="fa-solid fa-right-from-bracket w-4"></i> ထွက်မည်
+                </a>
+            </div>
+        </aside>
+
+        <!-- Main -->
+        <main class="flex-1 p-8 ml-64 overflow-y-auto gradient-bg">
+            <div class="max-w-7xl mx-auto">
+
+                <!-- Header -->
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+                    <div>
+                        <h2 class="text-2xl font-bold tracking-tight">
+                            <span class="text-gradient">📦 အမှာစာများ</span>
+                        </h2>
+                        <p class="text-white/40 text-sm mt-1 flex items-center gap-2">
+                            <i class="fa-regular fa-folder-open"></i>
+                            အားလုံး အမှာစာများ
+                            <span class="text-white/20">•</span>
+                            <span class="text-white/20">{{ orders|length }} ခု</span>
+                        </p>
+                    </div>
+                    <button onclick="location.reload()" class="refresh-btn">
+                        <i class="fa-solid fa-rotate"></i> Refresh
+                    </button>
+                </div>
+
+                <!-- Message -->
+                <div id="orderMessage" class="message-box"></div>
+
+                <!-- Search & Filter -->
+                <div class="flex flex-col sm:flex-row gap-4 mb-6">
+                    <div class="relative flex-1 max-w-sm">
+                        <i class="fa-solid fa-search absolute left-4 top-1/2 -translate-y-1/2 text-white/20 text-sm"></i>
+                        <input type="text" id="searchInput" placeholder="ရှာရန် (ID, သုံးစွဲသူ, ဝန်ဆောင်မှု)..." class="search-box" oninput="filterOrders()">
+                    </div>
+                    <div class="flex items-center gap-3 flex-wrap">
+                        <select id="statusFilter" class="status-filter" onchange="filterOrders()">
+                            <option value="all">📊 အားလုံး</option>
+                            <option value="pending">⏳ ဆိုင်းငံ့</option>
+                            <option value="processing">🔄 လုပ်ဆောင်နေဆဲ</option>
+                            <option value="completed">✅ ပြီးဆုံး</option>
+                            <option value="canceled">❌ ဖျက်သိမ်း</option>
+                            <option value="failed">💔 မအောင်မြင်</option>
+                        </select>
+                        <button onclick="resetFilters()" class="reset-btn">
+                            <i class="fa-solid fa-times"></i> ရှင်းမည်
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Table -->
+                <div class="glass-card">
+                    <div class="table-wrap">
+                        <table class="w-full text-left">
+                            <thead class="table-header text-white/40 text-xs uppercase tracking-wider">
+                                <tr>
+                                    <th class="px-5 py-3 font-semibold">ID</th>
+                                    <th class="px-5 py-3 font-semibold min-w-[120px]">သုံးစွဲသူ</th>
+                                    <th class="px-5 py-3 font-semibold min-w-[160px]">ဝန်ဆောင်မှု</th>
+                                    <th class="px-5 py-3 font-semibold min-w-[120px]">Link</th>
+                                    <th class="px-5 py-3 font-semibold text-center">ပမာဏ</th>
+                                    <th class="px-5 py-3 font-semibold text-right">ကုန်ကျ (USD)</th>
+                                    <th class="px-5 py-3 font-semibold text-right">ဈေးနှုန်း (MMK)</th>
+                                    <th class="px-5 py-3 font-semibold text-right">အမြတ် (MMK)</th>
+                                    <th class="px-5 py-3 font-semibold text-center">Provider ID</th>
+                                    <th class="px-5 py-3 font-semibold text-center">အခြေအနေ</th>
+                                    <th class="px-5 py-3 font-semibold text-center">လုပ်ဆောင်ချက်</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-white/5">
+                                {% for order in orders %}
+                                <tr class="table-row" data-id="{{ order.id }}" data-user="{{ order.user_name|lower }}" data-service="{{ order.service_name|lower }}" data-status="{{ order.status }}">
+                                    <td class="px-5 py-3">
+                                        <span class="order-id">#{{ order.id }}</span>
+                                    </td>
+                                    <td class="px-5 py-3">
+                                        <span class="text-sm font-medium text-white">{{ order.user_name }}</span>
+                                    </td>
+                                    <td class="px-5 py-3">
+                                        <div>
+                                            <div class="service-name">{{ order.service_name }}</div>
+                                            {% if order.category %}
+                                            <div class="service-category">{{ order.category }}</div>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                    <td class="px-5 py-3">
+                                        <a href="{{ order.link }}" target="_blank" class="link-text" title="{{ order.link }}">
+                                            {{ order.link|truncate(30, true) }}
+                                        </a>
+                                    </td>
+                                    <td class="px-5 py-3 text-center">
+                                        <span class="text-sm text-white/70">{{ order.quantity }}</span>
+                                    </td>
+                                    <td class="px-5 py-3 text-right">
+                                        <span class="text-sm font-mono text-white/50">${{ "%.2f"|format(order.cost) }}</span>
+                                    </td>
+                                    <td class="px-5 py-3 text-right">
+                                        <span class="text-sm font-mono text-cyan-400">{{ "%.0f"|format(order.price) }} MMK</span>
+                                    </td>
+                                    <td class="px-5 py-3 text-right">
+                                        <span class="text-sm font-mono {% if order.profit > 0 %}profit-positive{% else %}profit-negative{% endif %}">
+                                            {{ "%.0f"|format(order.profit) }} MMK
+                                        </span>
+                                    </td>
+                                    <td class="px-5 py-3 text-center">
+                                        <span class="text-xs text-white/30 font-mono">{{ order.provider_order_id or '-' }}</span>
+                                    </td>
+                                    <td class="px-5 py-3 text-center">
+                                        <span class="status-badge {{ order.status }}">
+                                            <span class="dot"></span>
+                                            {% if order.status == 'completed' %}ပြီးဆုံး
+                                            {% elif order.status == 'pending' %}ဆိုင်းငံ့
+                                            {% elif order.status == 'processing' %}လုပ်ဆောင်နေဆဲ
+                                            {% elif order.status == 'canceled' %}ဖျက်သိမ်း
+                                            {% elif order.status == 'failed' %}မအောင်မြင်
+                                            {% else %}{{ order.status }}{% endif %}
+                                        </span>
+                                    </td>
+                                    <td class="px-5 py-3 text-center">
+                                        <div class="flex flex-col items-center gap-1.5">
+                                            <select class="status-select" onchange="updateStatus({{ order.id }}, this.value)">
+                                                <option value="pending" {% if order.status == 'pending' %}selected{% endif %}>ဆိုင်းငံ့</option>
+                                                <option value="processing" {% if order.status == 'processing' %}selected{% endif %}>လုပ်ဆောင်နေဆဲ</option>
+                                                <option value="completed" {% if order.status == 'completed' %}selected{% endif %}>ပြီးဆုံး</option>
+                                                <option value="canceled" {% if order.status == 'canceled' %}selected{% endif %}>ဖျက်သိမ်း</option>
+                                                <option value="failed" {% if order.status == 'failed' %}selected{% endif %}>မအောင်မြင်</option>
+                                            </select>
+                                            <div class="flex items-center gap-1">
+                                                <button onclick="syncToProvider({{ order.id }})" class="action-btn sync" title="Provider သို့ ပြန်ပို့">
+                                                    <i class="fa-solid fa-sync"></i>
+                                                </button>
+                                                <button onclick="deleteOrder({{ order.id }})" class="action-btn delete" title="ဖျက်မည်">
+                                                    <i class="fa-solid fa-trash"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td colspan="11" class="px-5 py-12 text-center text-white/30">
+                                        <div class="text-5xl mb-3 opacity-20">📭</div>
+                                        <p class="text-lg">အမှာစာများ မရှိသေးပါ</p>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // ===== FILTER =====
+        function filterOrders() {
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            const statusFilter = document.getElementById('statusFilter').value;
+            const rows = document.querySelectorAll('.table-row');
+            rows.forEach(row => {
+                const id = row.getAttribute('data-id');
+                const user = row.getAttribute('data-user');
+                const service = row.getAttribute('data-service');
+                const status = row.getAttribute('data-status');
+                const matchSearch = id.includes(search) || user.includes(search) || service.includes(search);
+                const matchStatus = statusFilter === 'all' || status === statusFilter;
+                row.style.display = (matchSearch && matchStatus) ? '' : 'none';
+            });
+        }
+        document.getElementById('searchInput').addEventListener('input', filterOrders);
+        document.getElementById('statusFilter').addEventListener('change', filterOrders);
+
+        function resetFilters() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('statusFilter').value = 'all';
+            filterOrders();
+        }
+
+        // ===== UPDATE STATUS =====
+        function updateStatus(orderId, newStatus) {
+            if (!confirm('အမှာစာအခြေအနေကို "' + newStatus + '" သို့ ပြောင်းမှာ သေချာလား?')) {
+                const row = document.querySelector(`.table-row[data-id="${orderId}"]`);
+                if (row) {
+                    const select = row.querySelector('.status-select');
+                    select.value = row.getAttribute('data-status');
+                }
+                return;
+            }
+            showMessage('info', 'Status ပြောင်းနေပါသည်...');
+            fetch('/admin/orders/' + orderId + '/status', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ status: newStatus })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    const statusNames = {
+                        'pending': 'ဆိုင်းငံ့',
+                        'processing': 'လုပ်ဆောင်နေဆဲ',
+                        'completed': 'ပြီးဆုံး',
+                        'canceled': 'ဖျက်သိမ်း',
+                        'failed': 'မအောင်မြင်'
+                    };
+                    showMessage('success', 'Status ကို "' + (statusNames[newStatus] || newStatus) + '" သို့ ပြောင်းပြီးပါပြီ။');
+                    const row = document.querySelector(`.table-row[data-id="${orderId}"]`);
+                    if (row) {
+                        row.setAttribute('data-status', newStatus);
+                        const badge = row.querySelector('.status-badge');
+                        badge.className = 'status-badge ' + newStatus;
+                        badge.innerHTML = '<span class="dot"></span> ' + (statusNames[newStatus] || newStatus);
+                    }
+                    setTimeout(() => hideMessage(), 3000);
+                } else {
+                    showMessage('error', data.error || 'Status ပြောင်းရာတွင် အမှားရှိပါသည်။');
+                }
+            })
+            .catch(err => showMessage('error', 'Error: ' + err.message));
+        }
+
+        // ===== SYNC TO PROVIDER =====
+        function syncToProvider(orderId) {
+            if (!confirm('ဒီအမှာစာကို Provider သို့ ပြန်ပို့မှာ သေချာလား?')) return;
+            showMessage('info', 'Provider သို့ ပို့နေပါသည်...');
+            fetch('/api/admin/sync-order/' + orderId, { method: 'POST' })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        showMessage('success', data.message || 'Order synced successfully!');
+                        setTimeout(() => location.reload(), 1500);
+                    } else {
+                        showMessage('error', data.message || data.error || 'Sync failed!');
+                    }
+                })
+                .catch(err => showMessage('error', 'Error: ' + err.message));
+        }
+
+        // ===== DELETE ORDER =====
+        function deleteOrder(orderId) {
+            if (!confirm('ဒီအမှာစာကို ဖျက်မှာ သေချာလား?')) return;
+            showMessage('info', 'ဖျက်နေပါသည်...');
+            fetch('/admin/orders/' + orderId, { method: 'DELETE' })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        showMessage('success', 'အမှာစာကို အောင်မြင်စွာ ဖျက်ပြီးပါပြီ။');
+                        const row = document.querySelector(`.table-row[data-id="${orderId}"]`);
+                        if (row) row.style.display = 'none';
+                        setTimeout(() => hideMessage(), 3000);
+                    } else {
+                        showMessage('error', data.error || 'ဖျက်ရာတွင် အမှားရှိပါသည်။');
+                    }
+                })
+                .catch(err => showMessage('error', 'Error: ' + err.message));
+        }
+
+        // ===== MESSAGE HELPERS =====
+        function showMessage(type, text) {
+            const el = document.getElementById('orderMessage');
+            el.className = 'message-box show ' + type;
+            el.innerHTML = '<i class="fa-solid ' + (type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-exclamation-circle' : 'fa-spinner fa-spin') + '"></i> ' + text;
+        }
+        function hideMessage() {
+            document.getElementById('orderMessage').className = 'message-box';
+        }
+
+        // ===== INIT =====
+        document.addEventListener('DOMContentLoaded', filterOrders);
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings | SMM Master</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body class="bg-slate-950 text-white">
+
+    <div class="flex h-screen">
+        <!-- Sidebar -->
+        <aside class="w-64 bg-slate-900 border-r border-slate-800 p-4 flex flex-col fixed h-full overflow-y-auto">
+            <div class="flex items-center gap-3 pb-6 border-b border-slate-800">
+                <div class="p-2 bg-violet-600 rounded-lg">
+                    <i class="fa-solid fa-screwdriver-wrench text-white"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-sm">SMM Admin</h1>
+                    <p class="text-[10px] text-slate-400">{{ session.username }}</p>
+                </div>
+            </div>
+
+            <nav class="flex-1 py-4 space-y-1">
+                <a href="{{ url_for('admin_dashboard') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm text-slate-300 hover:bg-slate-800 transition">
+                    <i class="fa-solid fa-gauge"></i> Dashboard
+                </a>
+                <a href="{{ url_for('admin_users') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm text-slate-300 hover:bg-slate-800 transition">
+                    <i class="fa-solid fa-users"></i> သုံးစွဲသူများ
+                </a>
+                <a href="{{ url_for('admin_orders') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm text-slate-300 hover:bg-slate-800 transition">
+                    <i class="fa-solid fa-cubes"></i> အမှာစာများ
+                </a>
+                <a href="{{ url_for('admin_services') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm text-slate-300 hover:bg-slate-800 transition">
+                    <i class="fa-solid fa-list"></i> ဝန်ဆောင်မှုများ
+                </a>
+                <a href="{{ url_for('admin_providers') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm text-slate-300 hover:bg-slate-800 transition">
+                    <i class="fa-solid fa-plug"></i> Providers
+                </a>
+                <a href="{{ url_for('admin_payment_methods') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm text-slate-300 hover:bg-slate-800 transition">
+                    <i class="fa-solid fa-wallet text-emerald-400"></i> ငွေသွင်းနည်းလမ်းများ
+                </a>
+                <a href="{{ url_for('admin_payments') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm text-slate-300 hover:bg-slate-800 transition">
+                    <i class="fa-solid fa-circle-dollar"></i> ငွေသွင်းလျှောက်လွှာများ
+                </a>
+                <a href="{{ url_for('admin_withdraws') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm text-slate-300 hover:bg-slate-800 transition">
+                    <i class="fa-solid fa-money-bill-wave text-rose-400"></i> ငွေထုတ်
+                </a>
+                <a href="{{ url_for('admin_tickets') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm text-slate-300 hover:bg-slate-800 transition">
+                    <i class="fa-solid fa-envelope-open-text"></i> အကူအညီတောင်းများ
+                </a>
+                <a href="{{ url_for('admin_settings') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm bg-violet-600/20 text-violet-400">
+                    <i class="fa-solid fa-gear"></i> စနစ်ပြင်ဆင်မှု
+                </a>
+            </nav>
+
+            <div class="border-t border-slate-800 pt-4">
+                <a href="{{ url_for('logout') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm text-rose-400 hover:bg-rose-950/30 transition">
+                    <i class="fa-solid fa-right-from-bracket"></i> ထွက်မည်
+                </a>
+            </div>
+        </aside>
+
+        <main class="flex-1 p-6 ml-64 overflow-y-auto">
+            <h2 class="text-2xl font-bold mb-6">⚙️ စနစ်ပြင်ဆင်မှုများ</h2>
+
+            <div id="settingsMessage" class="hidden mb-4 p-3 rounded-xl text-sm"></div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- ========================================================= -->
+                <!-- ၁။ အထွေထွေနှင့် အမြတ်နှုန်းဆက်တင်များ (General & Markup) -->
+                <!-- ========================================================= -->
+                <div class="lg:col-span-2 bg-slate-900/80 border border-slate-800 rounded-2xl p-6">
+                    <h3 class="text-lg font-bold mb-4">📌 အထွေထွေနှင့် အမြတ်နှုန်းသတ်မှတ်ချက်</h3>
+                    <form id="settingsForm" class="space-y-4">
+                        <!-- Row 1: Maintenance & Currency -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-400 uppercase mb-1">စနစ်အခြေအနေ</label>
+                                <select id="maintenance" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white outline-none focus:ring-2 focus:ring-violet-500">
+                                    <option value="false" {% if settings.maintenance == 'false' %}selected{% endif %}>ပွင့်ထား</option>
+                                    <option value="true" {% if settings.maintenance == 'true' %}selected{% endif %}>ပြုပြင်နေဆဲ (ပိတ်ထား)</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-400 uppercase mb-1">ငွေကြေးအမျိုးအစား</label>
+                                <select id="currency" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white outline-none focus:ring-2 focus:ring-violet-500">
+                                    <option value="USD" {% if settings.currency == 'USD' %}selected{% endif %}>USD ($)</option>
+                                    <option value="MMK" {% if settings.currency == 'MMK' %}selected{% endif %}>MMK (Ks)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Row 2: Exchange Rate & Display Currency -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-400 uppercase mb-1">Exchange Rate (1 USD = ? MMK)</label>
+                                <input type="number" id="exchangeRate" value="{{ settings.exchange_rate or '4000' }}" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white outline-none focus:ring-2 focus:ring-violet-500">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-400 uppercase mb-1">Display Currency</label>
+                                <select id="displayCurrency" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white outline-none focus:ring-2 focus:ring-violet-500">
+                                    <option value="MMK" {% if settings.display_currency == 'MMK' %}selected{% endif %}>MMK</option>
+                                    <option value="USD" {% if settings.display_currency == 'USD' %}selected{% endif %}>USD</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Row 3: Min Deposit & Withdraw -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-400 uppercase mb-1">အနည်းဆုံးငွေသွင်း (USD)</label>
+                                <input type="number" id="minDeposit" value="{{ settings.min_deposit or '5' }}" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white outline-none focus:ring-2 focus:ring-violet-500">
+                                <p class="text-[10px] text-slate-500 mt-1">သုံးစွဲသူများအတွက် အနည်းဆုံးငွေသွင်းပမာဏ (USD)</p>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-400 uppercase mb-1">အနည်းဆုံးငွေထုတ် (USD)</label>
+                                <input type="number" id="minWithdraw" value="{{ settings.min_withdraw or '10' }}" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white outline-none focus:ring-2 focus:ring-violet-500">
+                                <p class="text-[10px] text-slate-500 mt-1">Reseller များအတွက် အနည်းဆုံးငွေထုတ်ပမာဏ (USD)</p>
+                            </div>
+                        </div>
+
+                        <hr class="border-slate-700/50">
+
+                        <h4 class="text-md font-semibold text-cyan-400">💰 အမြတ်နှုန်း၊ လျှော့စျေးနှင့် Bonus သတ်မှတ်ချက်များ</h4>
+
+                        <!-- Row 4: User & Reseller Default Markup -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-400 uppercase mb-1">User Default Markup (%)</label>
+                                <input type="number" id="userDefaultMarkup" value="{{ settings.user_default_markup or '20' }}" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white outline-none focus:ring-2 focus:ring-violet-500">
+                                <p class="text-[10px] text-slate-500 mt-1">သာမန်သုံးစွဲသူများအတွက် ပုံမှန်အမြတ်နှုန်း</p>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-400 uppercase mb-1">Reseller Default Markup (%)</label>
+                                <input type="number" id="resellerDefaultMarkup" value="{{ settings.reseller_default_markup or '10' }}" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white outline-none focus:ring-2 focus:ring-violet-500">
+                                <p class="text-[10px] text-slate-500 mt-1">Reseller များအတွက် ပုံမှန်အမြတ်နှုန်း</p>
+                            </div>
+                        </div>
+
+                        <!-- Row 5: User & Reseller Discount -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-400 uppercase mb-1">User Discount (%)</label>
+                                <input type="number" id="userDiscount" value="{{ settings.user_discount or '0' }}" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white outline-none focus:ring-2 focus:ring-violet-500">
+                                <p class="text-[10px] text-slate-500 mt-1">သာမန်သုံးစွဲသူများအတွက် လျှော့စျေး (၀ ဆိုလျှင် မလျှော့ပါ)</p>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-400 uppercase mb-1">Reseller Discount (%)</label>
+                                <input type="number" id="resellerDiscount" value="{{ settings.reseller_discount or '0' }}" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white outline-none focus:ring-2 focus:ring-violet-500">
+                                <p class="text-[10px] text-slate-500 mt-1">Reseller များအတွက် လျှော့စျေး (၀ ဆိုလျှင် မလျှော့ပါ)</p>
+                            </div>
+                        </div>
+
+                        <!-- Row 6: Bonus & Bonus Type -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-400 uppercase mb-1">Order Bonus (MMK)</label>
+                                <input type="number" id="orderBonus" value="{{ settings.order_bonus or '0' }}" step="0.01" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white outline-none focus:ring-2 focus:ring-violet-500">
+                                <p class="text-[10px] text-slate-500 mt-1">အမှာစာတစ်ခုပြီးတိုင်း ရမည့် Bonus (၀ ဆိုလျှင် မပေးပါ)</p>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-400 uppercase mb-1">Bonus Type</label>
+                                <select id="bonusType" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white outline-none focus:ring-2 focus:ring-violet-500">
+                                    <option value="fixed" {% if settings.bonus_type == 'fixed' %}selected{% endif %}>Fixed (ပုံသေပမာဏ)</option>
+                                    <option value="percentage" {% if settings.bonus_type == 'percentage' %}selected{% endif %}>Percentage (ရာခိုင်နှုန်း)</option>
+                                </select>
+                                <p class="text-[10px] text-slate-500 mt-1">Bonus ကို ပုံသေငွေပမာဏ သို့မဟုတ် အမှာစာ၏ ရာခိုင်နှုန်းဖြင့် သတ်မှတ်ပါ</p>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="w-full bg-violet-600 hover:bg-violet-500 text-white font-bold py-2.5 rounded-xl transition">
+                            <i class="fa-solid fa-save mr-2"></i> စနစ်ဆက်တင်များ သိမ်းမည်
+                        </button>
+                    </form>
+                </div>
+
+                <!-- ========================================================= -->
+                <!-- ၂။ KPay ဆက်တင်များ -->
+                <!-- ========================================================= -->
+                <div class="lg:col-span-1 bg-blue-500/10 border border-blue-500/30 rounded-2xl p-6">
+                    <h3 class="text-lg font-bold mb-4 text-blue-400">🏦 KPay ငွေလက်ခံသူသတ်မှတ်ချက်</h3>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-400 uppercase mb-1">ငွေလက်ခံသူအမည်</label>
+                            <input type="text" id="kpayName" value="{{ settings.kpay_name or 'SMM Master Admin' }}" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-400 uppercase mb-1">KPay ဖုန်းနံပါတ်</label>
+                            <input type="text" id="kpayPhone" value="{{ settings.kpay_phone or '09-771234567' }}" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <button onclick="saveKPaySettings()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-2.5 rounded-xl transition">
+                            <i class="fa-solid fa-save mr-2"></i> KPay သတ်မှတ်ချက်များ သိမ်းမည်
+                        </button>
+                    </div>
+                </div>
+
+                <!-- ========================================================= -->
+                <!-- ၃။ Providers List (အမြန်ကြည့်ရန်) -->
+                <!-- ========================================================= -->
+                <div class="lg:col-span-1 bg-slate-900/80 border border-slate-800 rounded-2xl p-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-lg font-bold">🔌 ချိတ်ဆက်ထားသော Providers</h3>
+                        <a href="{{ url_for('admin_providers') }}" class="bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-1.5 rounded-lg text-xs transition flex items-center gap-1">
+                            <i class="fa-solid fa-arrow-right"></i> Manage
+                        </a>
+                    </div>
+                    <div class="space-y-2 max-h-[250px] overflow-y-auto">
+                        {% for provider in providers %}
+                        <div class="bg-slate-800/50 p-3 rounded-xl border border-slate-700">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h4 class="font-semibold text-sm text-white">{{ provider.name }}</h4>
+                                    <p class="text-xs text-slate-400">{{ provider.api_type }}</p>
+                                </div>
+                                <span class="px-2 py-0.5 rounded text-xs font-semibold 
+                                    {% if provider.status == 'active' %}bg-emerald-500/20 text-emerald-400
+                                    {% else %}bg-rose-500/20 text-rose-400{% endif %}">
+                                    {{ provider.status }}
+                                </span>
+                            </div>
+                            <p class="text-xs text-slate-500 mt-1 truncate">{{ provider.url }}</p>
+                            <div class="flex gap-2 mt-2">
+                                <button onclick="testProvider({{ provider.id }})" class="text-xs bg-blue-600 hover:bg-blue-500 text-white px-2 py-1 rounded transition">
+                                    <i class="fa-solid fa-plug"></i> Test
+                                </button>
+                                <button onclick="syncProvider({{ provider.id }})" class="text-xs bg-emerald-600 hover:bg-emerald-500 text-white px-2 py-1 rounded transition">
+                                    <i class="fa-solid fa-sync"></i> Sync
+                                </button>
+                            </div>
+                            <div id="providerResult{{ provider.id }}" class="mt-1 text-xs hidden"></div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- ========================================================= -->
+                <!-- ၄။ စနစ်အချက်အလက် (System Info) -->
+                <!-- ========================================================= -->
+                <div class="lg:col-span-2 bg-slate-900/80 border border-slate-800 rounded-2xl p-6">
+                    <h3 class="text-lg font-bold mb-4">ℹ️ စနစ်အချက်အလက်</h3>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                        <div class="flex flex-col py-2 border-b border-slate-800/50">
+                            <span class="text-slate-400">စနစ်အမည်</span>
+                            <span class="text-white font-semibold">SMM Master</span>
+                        </div>
+                        <div class="flex flex-col py-2 border-b border-slate-800/50">
+                            <span class="text-slate-400">ဗားရှင်း</span>
+                            <span class="text-white font-semibold">2.0.0</span>
+                        </div>
+                        <div class="flex flex-col py-2 border-b border-slate-800/50">
+                            <span class="text-slate-400">ဒေတာဘေ့စ်</span>
+                            <span class="text-white font-semibold">MySQL</span>
+                        </div>
+                        <div class="flex flex-col py-2 border-b border-slate-800/50">
+                            <span class="text-slate-400">Exchange Rate</span>
+                            <span class="text-white font-semibold">1 USD = {{ settings.exchange_rate or '4000' }} MMK</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // ===== Show Message =====
+        function showMessage(message, type) {
+            const msgDiv = document.getElementById('settingsMessage');
+            msgDiv.classList.remove('hidden');
+            const types = {
+                success: 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30',
+                error: 'bg-rose-500/20 text-rose-400 border border-rose-500/30',
+                info: 'bg-blue-500/20 text-blue-400 border border-blue-500/30'
+            };
+            msgDiv.className = 'mb-4 p-3 rounded-xl text-sm ' + (types[type] || types.info);
+            msgDiv.innerHTML = '<i class="fa-solid fa-circle-info mr-2"></i> ' + message;
+        }
+
+        // ===== General + Markup Settings Submit =====
+        document.getElementById('settingsForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const data = {
+                // General
+                maintenance: document.getElementById('maintenance').value,
+                currency: document.getElementById('currency').value,
+                exchange_rate: document.getElementById('exchangeRate').value,
+                display_currency: document.getElementById('displayCurrency').value,
+                min_deposit: document.getElementById('minDeposit').value,
+                min_withdraw: document.getElementById('minWithdraw').value,
+                // Markup, Discount, Bonus
+                user_default_markup: document.getElementById('userDefaultMarkup').value,
+                reseller_default_markup: document.getElementById('resellerDefaultMarkup').value,
+                user_discount: document.getElementById('userDiscount').value,
+                reseller_discount: document.getElementById('resellerDiscount').value,
+                order_bonus: document.getElementById('orderBonus').value,
+                bonus_type: document.getElementById('bonusType').value
+            };
+
+            fetch('/admin/settings', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            })
+            .then(res => res.json())
+            .then(() => {
+                showMessage('✅ စနစ်ပြင်ဆင်မှုများ အောင်မြင်စွာ သိမ်းဆည်းပြီးပါပြီ။', 'success');
+                setTimeout(() => location.reload(), 1500);
+            })
+            .catch(err => {
+                showMessage('❌ Error: ' + err.message, 'error');
+            });
+        });
+
+        // ===== Save KPay Settings =====
+        function saveKPaySettings() {
+            const data = {
+                kpay_name: document.getElementById('kpayName').value,
+                kpay_phone: document.getElementById('kpayPhone').value
+            };
+
+            fetch('/admin/settings', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            })
+            .then(res => res.json())
+            .then(() => {
+                showMessage('✅ KPay သတ်မှတ်ချက်များ သိမ်းဆည်းပြီးပါပြီ။', 'success');
+                setTimeout(() => location.reload(), 1500);
+            })
+            .catch(err => {
+                showMessage('❌ Error: ' + err.message, 'error');
+            });
+        }
+
+        // ===== Test Provider =====
+        function testProvider(providerId) {
+            const resultDiv = document.getElementById('providerResult' + providerId);
+            resultDiv.className = 'mt-1 text-xs p-1.5 rounded bg-blue-500/20 text-blue-400';
+            resultDiv.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1"></i> Testing...';
+            resultDiv.classList.remove('hidden');
+
+            fetch('/admin/providers/' + providerId + '/test', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' }
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    resultDiv.className = 'mt-1 text-xs p-1.5 rounded bg-emerald-500/20 text-emerald-400';
+                    resultDiv.innerHTML = '<i class="fa-solid fa-check-circle mr-1"></i> ' + data.message;
+                } else {
+                    resultDiv.className = 'mt-1 text-xs p-1.5 rounded bg-rose-500/20 text-rose-400';
+                    resultDiv.innerHTML = '<i class="fa-solid fa-exclamation-circle mr-1"></i> ' + (data.error || 'Connection failed');
+                }
+            })
+            .catch(err => {
+                resultDiv.className = 'mt-1 text-xs p-1.5 rounded bg-rose-500/20 text-rose-400';
+                resultDiv.innerHTML = '<i class="fa-solid fa-exclamation-circle mr-1"></i> Error: ' + err.message;
+            });
+        }
+
+        // ===== Sync Provider =====
+        function syncProvider(providerId) {
+            if (!confirm('Provider မှ Services များကို ဆွဲထည့်မှာ သေချာလား?')) return;
+
+            const resultDiv = document.getElementById('providerResult' + providerId);
+            resultDiv.className = 'mt-1 text-xs p-1.5 rounded bg-blue-500/20 text-blue-400';
+            resultDiv.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1"></i> Syncing services...';
+            resultDiv.classList.remove('hidden');
+
+            fetch('/admin/providers/' + providerId + '/sync', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' }
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    resultDiv.className = 'mt-1 text-xs p-1.5 rounded bg-emerald-500/20 text-emerald-400';
+                    resultDiv.innerHTML = '<i class="fa-solid fa-check-circle mr-1"></i> ' + data.message;
+                } else {
+                    resultDiv.className = 'mt-1 text-xs p-1.5 rounded bg-rose-500/20 text-rose-400';
+                    resultDiv.innerHTML = '<i class="fa-solid fa-exclamation-circle mr-1"></i> ' + (data.error || 'Sync failed');
+                }
+            })
+            .catch(err => {
+                resultDiv.className = 'mt-1 text-xs p-1.5 rounded bg-rose-500/20 text-rose-400';
+                resultDiv.innerHTML = '<i class="fa-solid fa-exclamation-circle mr-1"></i> Error: ' + err.message;
+            });
+        }
+    </script>
+</body>
+</html>

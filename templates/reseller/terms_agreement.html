@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>မူဝါဒနှင့် စည်းကမ်းချက်များ | SMM Master</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        * { font-family: 'Inter', sans-serif; }
+        body { background: #0a0a0f; }
+        .gradient-bg {
+            background: radial-gradient(ellipse at 20% 50%, rgba(6, 182, 212, 0.05) 0%, transparent 60%),
+                        radial-gradient(ellipse at 80% 50%, rgba(15, 23, 42, 0.8) 0%, #0a0a0f 100%);
+            min-height: 100vh;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.02);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+        }
+        .policy-section { border-left: 3px solid rgba(6, 182, 212, 0.3); padding-left: 16px; margin-bottom: 20px; }
+        .policy-section.danger { border-left-color: rgba(244, 63, 94, 0.5); }
+        .policy-section.warning { border-left-color: rgba(251, 191, 36, 0.5); }
+        .btn-agree {
+            background: linear-gradient(135deg, #06b6d4, #0891b2);
+            box-shadow: 0 4px 30px rgba(6, 182, 212, 0.25);
+            transition: all 0.3s ease;
+        }
+        .btn-agree:hover { transform: translateY(-2px); box-shadow: 0 8px 40px rgba(6, 182, 212, 0.4); }
+        .btn-agree:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+        .custom-scroll::-webkit-scrollbar { width: 4px; }
+        .custom-scroll::-webkit-scrollbar-track { background: transparent; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: rgba(6, 182, 212, 0.3); border-radius: 10px; }
+    </style>
+</head>
+<body class="gradient-bg text-white">
+
+    <div class="container mx-auto px-4 py-12 max-w-3xl">
+        <div class="glass-card p-8 md:p-12">
+            <!-- Header -->
+            <div class="text-center mb-8">
+                <div class="inline-flex p-3 bg-cyan-500/10 rounded-2xl mb-4 border border-cyan-500/20">
+                    <i class="fa-solid fa-file-shield text-4xl text-cyan-400"></i>
+                </div>
+                <h1 class="text-3xl font-extrabold tracking-tight">
+                    <span class="bg-gradient-to-r from-cyan-400 to-teal-400 bg-clip-text text-transparent">မူဝါဒနှင့် စည်းကမ်းချက်များ</span>
+                </h1>
+                <p class="text-white/40 text-sm mt-2">ဤဝန်ဆောင်မှုကို အသုံးပြုရန်အတွက် အောက်ပါအချက်များကို သေချာဖတ်ပြီး သဘောတူရပါမည်။</p>
+            </div>
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="mb-6 p-4 rounded-xl text-sm 
+                            {% if category == 'success' %}bg-emerald-500/20 text-emerald-400 border border-emerald-500/30
+                            {% elif category == 'error' %}bg-rose-500/20 text-rose-400 border border-rose-500/30
+                            {% else %}bg-blue-500/20 text-blue-400 border border-blue-500/30{% endif %}">
+                            <i class="fa-solid fa-circle-info mr-2"></i> {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <form method="POST" id="agreementForm" class="space-y-6">
+                <div class="space-y-4 max-h-[500px] overflow-y-auto pr-2 custom-scroll">
+                    <!-- ၁။ လိုက်နာရမည့် စည်းကမ်းများ -->
+                    <div class="policy-section">
+                        <h3 class="text-lg font-bold text-white flex items-center gap-2"><i class="fa-regular fa-circle-check text-cyan-400"></i> ၁။ လိုက်နာရမည့် စည်းကမ်းများ</h3>
+                        <p class="text-sm text-white/70 leading-relaxed">ဤ SMM Panel ၏ မူဝါဒများ၊ စည်းကမ်းချက်များနှင့် ညွှန်ကြားချက်များကို အပြည့်အဝ လိုက်နာရမည်။ ဝန်ဆောင်မှုကို တရားဝင်သော လုပ်ငန်းများအတွက်သာ အသုံးပြုရမည်။</p>
+                    </div>
+                    <!-- ၂။ အမိန့်ပယ်ဖျက်ခြင်းနှင့် ငွေပြန်အမ်းခြင်း -->
+                    <div class="policy-section danger">
+                        <h3 class="text-lg font-bold text-white flex items-center gap-2"><i class="fa-solid fa-ban text-rose-400"></i> ၂။ အမိန့်ပယ်ဖျက်ခြင်းနှင့် ငွေပြန်အမ်းခြင်း</h3>
+                        <p class="text-sm text-white/70 leading-relaxed"><span class="text-rose-400 font-semibold">တစ်ကြိမ်တင်ပြီးသော အမိန့်များကို ပယ်ဖျက်ခြင်း၊ ပြင်ဆင်ခြင်း သို့မဟုတ် ငွေပြန်အမ်းခြင်း မပြုနိုင်ပါ။</span> အမိန့်မတင်မီ ဝန်ဆောင်မှုအသေးစိတ်နှင့် စျေးနှုန်းကို သေချာစစ်ဆေးပါ။</p>
+                    </div>
+                    <!-- ၃။ လိမ်ညာမှုနှင့် အလွဲသုံးစားမှု -->
+                    <div class="policy-section danger">
+                        <h3 class="text-lg font-bold text-white flex items-center gap-2"><i class="fa-solid fa-gavel text-rose-400"></i> ၃။ လိမ်ညာမှုနှင့် အလွဲသုံးစားမှု</h3>
+                        <p class="text-sm text-white/70 leading-relaxed">မှားယွင်းသော အချက်အလက်များ ဖြည့်သွင်းခြင်း၊ ငွေလိမ်လည်ခြင်း၊ စနစ်ကို အလွဲသုံးစားပြုခြင်း၊ အခြားသုံးစွဲသူများကို အနိုင်ကျင့်ခြင်းတို့ကို <span class="text-rose-400 font-semibold">လုံးဝခွင့်မပြုပါ။</span><br><br><span class="bg-rose-500/10 border border-rose-500/20 text-rose-300 px-3 py-1.5 rounded-lg inline-block text-xs font-semibold">⚠️ လိမ်ညာမှုတွေ့ရှိပါက အကောင့်ကို ချက်ချင်းပိတ်သိမ်းမည်၊ ငွေလက်ကျန်အားလုံး သိမ်းဆည်းခံရမည်၊ ဥပဒေအရ အရေးယူခံရနိုင်သည်။</span></p>
+                    </div>
+                    <!-- ၄။ ငွေထုတ်ခြင်းဆိုင်ရာ -->
+                    <div class="policy-section warning">
+                        <h3 class="text-lg font-bold text-white flex items-center gap-2"><i class="fa-solid fa-clock text-amber-400"></i> ၄။ ငွေထုတ်ခြင်းဆိုင်ရာ</h3>
+                        <p class="text-sm text-white/70 leading-relaxed">ငွေထုတ်လျှောက်လွှာများကို Admin မှ စစ်ဆေးအတည်ပြုပြီးမှသာ ငွေလွှဲပေးမည်။ အတည်ပြုချိန် <span class="text-amber-400 font-semibold">၂၄ နာရီမှ ၄၈ နာရီ</span> အထိ ကြာနိုင်သည်။ သတ်မှတ်ထားသော အနည်းဆုံးငွေပမာဏထက် မနည်းရပါ။</p>
+                    </div>
+                    <!-- ၅။ တာဝန်ယူမှု -->
+                    <div class="policy-section">
+                        <h3 class="text-lg font-bold text-white flex items-center gap-2"><i class="fa-solid fa-user-shield text-cyan-400"></i> ၅။ တာဝန်ယူမှု</h3>
+                        <p class="text-sm text-white/70 leading-relaxed">သုံးစွဲသူအနေဖြင့် မိမိ၏ အကောင့်အချက်အလက်များ (username, password) ကို <span class="text-cyan-400 font-semibold">လုံခြုံစွာ ထိန်းသိမ်းရမည်။</span> အကောင့်ခိုးယူခံရခြင်း၊ ပေါက်ကြားခံရခြင်းအတွက် Panel က တာဝန်ယူမည်မဟုတ်ပါ။</p>
+                    </div>
+                    <!-- ၆။ ငွေသွင်းခြင်းဆိုင်ရာ -->
+                    <div class="policy-section">
+                        <h3 class="text-lg font-bold text-white flex items-center gap-2"><i class="fa-solid fa-money-bill-transfer text-emerald-400"></i> ၆။ ငွေသွင်းခြင်းဆိုင်ရာ</h3>
+                        <p class="text-sm text-white/70 leading-relaxed">ငွေသွင်းလျှောက်လွှာများကို Admin မှ အတည်ပြုပြီးမှသာ အကောင့်သို့ ငွေထည့်ပေးမည်။ ငွေသွင်းသည့်အထောက်အထား (Transaction ID, Screenshot) ကို မှန်ကန်စွာ ဖြည့်သွင်းရမည်။</p>
+                    </div>
+                    <!-- ၇။ အခြားအချက်များ -->
+                    <div class="policy-section">
+                        <h3 class="text-lg font-bold text-white flex items-center gap-2"><i class="fa-solid fa-ellipsis text-slate-400"></i> ၇။ အခြားအချက်များ</h3>
+                        <p class="text-sm text-white/70 leading-relaxed">Admin သည် မူဝါဒများကို အချိန်မရွေး ပြင်ဆင်နိုင်သည်။ ပြင်ဆင်ချက်များကို ဤစာမျက်နှာတွင် ကြေညာမည်ဖြစ်ပြီး ဆက်လက်အသုံးပြုခြင်းသည် သဘောတူညီသည်ဟု မှတ်ယူမည်။</p>
+                    </div>
+                </div>
+
+                <div class="border-t border-white/10 pt-6"></div>
+
+                <!-- Agreement Checkbox -->
+                <div class="flex items-start gap-4 p-4 bg-white/5 rounded-xl border border-white/10 hover:border-cyan-500/30 transition">
+                    <input type="checkbox" id="agree" name="agree" value="yes" class="w-5 h-5 mt-1 accent-cyan-500 cursor-pointer flex-shrink-0">
+                    <label for="agree" class="text-sm text-white/80 leading-relaxed cursor-pointer">
+                        အထက်ပါ <strong class="text-white">မူဝါဒနှင့် စည်းကမ်းချက်များ</strong> အားလုံးကို ဖတ်ရှုနားလည်ပြီး 
+                        <span class="text-rose-400 font-semibold">အပြည့်အဝ သဘောတူညီပါသည်။</span>
+                        <br><span class="text-xs text-white/30">(ဤသဘောတူချက်ကို Admin ထံ ပေးပို့မည်ဖြစ်ပြီး မှတ်တမ်းတင်ထားမည်)</span>
+                    </label>
+                </div>
+
+                <button type="submit" id="submitBtn" disabled class="btn-agree w-full text-white font-bold py-4 rounded-xl text-lg flex items-center justify-center gap-3">
+                    <i class="fa-solid fa-paper-plane"></i> သဘောတူပြီး Admin သို့ ပို့မည်
+                </button>
+                <p class="text-center text-[10px] text-white/20 mt-2"><i class="fa-regular fa-clock mr-1"></i> သဘောတူပြီးပါက Admin မှ အတည်ပြုသည်အထိ စောင့်ဆိုင်းရမည်။</p>
+            </form>
+
+            <div class="text-center mt-6">
+                <a href="{{ url_for('user_dashboard') }}" class="text-xs text-white/30 hover:text-white/60 transition"><i class="fa-solid fa-arrow-left mr-1"></i> နောက်သို့ ပြန်သွားရန်</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const checkbox = document.getElementById('agree');
+        const submitBtn = document.getElementById('submitBtn');
+        checkbox.addEventListener('change', function() { submitBtn.disabled = !this.checked; });
+        document.getElementById('agreementForm').addEventListener('submit', function(e) {
+            if (!checkbox.checked) { e.preventDefault(); alert('ကျေးဇူးပြု၍ မူဝါဒနှင့် စည်းကမ်းချက်များကို သဘောတူပါ။'); }
+        });
+    </script>
+
+</body>
+</html>

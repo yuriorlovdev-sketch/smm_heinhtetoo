@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tickets | SMM Master</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body class="bg-slate-950 text-white">
+
+    <div class="flex h-screen">
+        <!-- Sidebar -->
+        <aside class="w-64 bg-slate-900 border-r border-slate-800 p-4 flex flex-col fixed h-full overflow-y-auto">
+            <div class="flex items-center gap-3 pb-6 border-b border-slate-800">
+                <div class="p-2 bg-violet-600 rounded-lg">
+                    <i class="fa-solid fa-screwdriver-wrench text-white"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-sm">SMM Admin</h1>
+                    <p class="text-[10px] text-slate-400">{{ session.username }}</p>
+                </div>
+            </div>
+            
+            <nav class="flex-1 py-4 space-y-1">
+                <a href="{{ url_for('admin_dashboard') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm text-slate-300 hover:bg-slate-800 transition">
+                    <i class="fa-solid fa-gauge"></i> Dashboard
+                </a>
+                <a href="{{ url_for('admin_users') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm text-slate-300 hover:bg-slate-800 transition">
+                    <i class="fa-solid fa-users"></i> သုံးစွဲသူများ
+                </a>
+                <a href="{{ url_for('admin_user_agreements') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm text-slate-300 hover:bg-slate-800 transition">
+                    <i class="fa-solid fa-file-shield"></i> မူဝါဒသဘောတူမှု
+                </a>
+                <a href="{{ url_for('admin_orders') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm text-slate-300 hover:bg-slate-800 transition">
+                    <i class="fa-solid fa-cubes"></i> အမှာစာများ
+                </a>
+                <a href="{{ url_for('admin_services') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm text-slate-300 hover:bg-slate-800 transition">
+                    <i class="fa-solid fa-list"></i> ဝန်ဆောင်မှုများ
+                </a>
+                <a href="{{ url_for('admin_providers') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm text-slate-300 hover:bg-slate-800 transition">
+                    <i class="fa-solid fa-plug"></i> Providers
+                </a>
+                <a href="{{ url_for('admin_payment_methods') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm text-slate-300 hover:bg-slate-800 transition">
+                    <i class="fa-solid fa-wallet text-emerald-400"></i> ငွေသွင်းနည်းလမ်းများ
+                </a>
+                <a href="{{ url_for('admin_payments') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm text-slate-300 hover:bg-slate-800 transition">
+                    <i class="fa-solid fa-circle-dollar"></i> ငွေသွင်းလျှောက်လွှာများ
+                </a>
+                <a href="{{ url_for('admin_withdraws') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm text-slate-300 hover:bg-slate-800 transition">
+                    <i class="fa-solid fa-money-bill-wave text-rose-400"></i> ငွေထုတ်
+                </a>
+                <a href="{{ url_for('admin_tickets') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm bg-violet-600/20 text-violet-400">
+                    <i class="fa-solid fa-envelope-open-text"></i> အကူအညီတောင်းများ
+                </a>
+                <a href="{{ url_for('admin_settings') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm text-slate-300 hover:bg-slate-800 transition">
+                    <i class="fa-solid fa-gear"></i> စနစ်ပြင်ဆင်မှု
+                </a>
+            </nav>
+            
+            <div class="border-t border-slate-800 pt-4">
+                <a href="{{ url_for('logout') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm text-rose-400 hover:bg-rose-950/30 transition">
+                    <i class="fa-solid fa-right-from-bracket"></i> ထွက်မည်
+                </a>
+            </div>
+        </aside>
+
+        <main class="flex-1 p-6 ml-64 overflow-y-auto">
+            <!-- ===== TICKETS SECTION ===== -->
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold">🎫 အကူအညီတောင်းခံမှုများ</h2>
+                <a href="{{ url_for('admin_ticket_broadcast') }}" class="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded-lg text-sm transition flex items-center gap-2">
+                    <i class="fa-solid fa-bullhorn"></i> Broadcast
+                </a>
+            </div>
+
+            <!-- Stats -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-4">
+                    <p class="text-xs text-slate-400 uppercase">စုစုပေါင်း</p>
+                    <p class="text-2xl font-bold text-white">{{ total_tickets }}</p>
+                </div>
+                <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-4">
+                    <p class="text-xs text-slate-400 uppercase">ဖွင့်ထားဆဲ</p>
+                    <p class="text-2xl font-bold text-amber-400">{{ open_tickets }}</p>
+                </div>
+                <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-4">
+                    <p class="text-xs text-slate-400 uppercase">ပြန်ကြားပြီး</p>
+                    <p class="text-2xl font-bold text-blue-400">{{ replied_tickets }}</p>
+                </div>
+                <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-4">
+                    <p class="text-xs text-slate-400 uppercase">ပိတ်ပြီး</p>
+                    <p class="text-2xl font-bold text-emerald-400">{{ closed_tickets }}</p>
+                </div>
+            </div>
+
+            <!-- Tickets Table -->
+            <div class="bg-slate-900/80 border border-slate-800 rounded-2xl overflow-hidden mb-8">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm">
+                        <thead>
+                            <tr class="text-left text-slate-400 border-b border-slate-800">
+                                <th class="px-4 py-3">ID</th>
+                                <th class="px-4 py-3">ခေါင်းစဉ်</th>
+                                <th class="px-4 py-3">သုံးစွဲသူ</th>
+                                <th class="px-4 py-3">အမျိုးအစား</th>
+                                <th class="px-4 py-3 text-center">အခြေအနေ</th>
+                                <th class="px-4 py-3 text-center">ရက်စွဲ</th>
+                                <th class="px-4 py-3 text-center">လုပ်ဆောင်ချက်</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for ticket in tickets %}
+                            <tr class="border-b border-slate-800/50 hover:bg-slate-800/30">
+                                <td class="px-4 py-3 font-mono text-xs text-slate-400">#{{ ticket.id }}</td>
+                                <td class="px-4 py-3">{{ ticket.subject[:30] }}{% if ticket.subject|length > 30 %}...{% endif %}</td>
+                                <td class="px-4 py-3">{{ ticket.user_name }}</td>
+                                <td class="px-4 py-3 text-xs text-slate-400">{{ ticket.category }}</td>
+                                <td class="px-4 py-3 text-center">
+                                    <span class="px-2 py-1 rounded text-xs font-semibold 
+                                        {% if ticket.status == 'open' %}bg-amber-500/20 text-amber-400
+                                        {% elif ticket.status == 'replied' %}bg-blue-500/20 text-blue-400
+                                        {% else %}bg-emerald-500/20 text-emerald-400{% endif %}">
+                                        {% if ticket.status == 'open' %}⏳ ဖွင့်ထားဆဲ
+                                        {% elif ticket.status == 'replied' %}📩 ပြန်ကြားပြီး
+                                        {% else %}✅ ပိတ်ပြီး{% endif %}
+                                    </span>
+                                </td>
+                                <td class="px-4 py-3 text-center text-xs text-slate-400">
+                                    {{ ticket.created_at.strftime('%Y-%m-%d') if ticket.created_at else '' }}
+                                </td>
+                                <td class="px-4 py-3 text-center">
+                                    <a href="{{ url_for('admin_ticket_detail', ticket_id=ticket.id) }}" class="text-blue-400 hover:text-blue-300 transition text-xs">
+                                        <i class="fa-regular fa-eye"></i> ကြည့်မည်
+                                    </a>
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="7" class="px-4 py-8 text-center text-slate-500">အကူအညီတောင်းခံမှုများ မရှိသေးပါ</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ===== USER AGREEMENTS SECTION (ထည့်သွင်းထားသော အပိုင်း) ===== -->
+            <div class="mt-8">
+                <h2 class="text-2xl font-bold mb-6">🛡️ သုံးစွဲသူများ၏ မူဝါဒသဘောတူမှုများ</h2>
+
+                <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-6">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm">
+                            <thead>
+                                <tr class="text-left text-slate-400 border-b border-slate-800">
+                                    <th class="pb-3">ID</th>
+                                    <th class="pb-3">သုံးစွဲသူ</th>
+                                    <th class="pb-3">Tier</th>
+                                    <th class="pb-3">IP Address</th>
+                                    <th class="pb-3">သဘောတူသည့်နေ့</th>
+                                    <th class="pb-3">အခြေအနေ</th>
+                                    <th class="pb-3 text-center">လုပ်ဆောင်ချက်</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for ag in agreements %}
+                                <tr class="border-b border-slate-800/50 hover:bg-slate-800/30">
+                                    <td class="py-3 font-mono text-xs text-slate-400">#{{ ag.id }}</td>
+                                    <td class="py-3">
+                                        <div>
+                                            <span class="font-semibold">{{ ag.user_name }}</span>
+                                            <span class="text-xs text-slate-500 block">{{ ag.username }}</span>
+                                        </div>
+                                    </td>
+                                    <td class="py-3">
+                                        <span class="px-2 py-1 rounded text-xs font-semibold 
+                                            {% if ag.tier == 'super_admin' %}bg-rose-500/20 text-rose-400
+                                            {% elif ag.tier == 'admin' %}bg-violet-500/20 text-violet-400
+                                            {% elif ag.tier == 'reseller' %}bg-cyan-500/20 text-cyan-400
+                                            {% else %}bg-slate-500/20 text-slate-400{% endif %}">
+                                            {{ ag.tier }}
+                                        </span>
+                                    </td>
+                                    <td class="py-3 text-xs text-slate-400 font-mono">{{ ag.ip_address }}</td>
+                                    <td class="py-3 text-xs text-slate-400">{{ ag.agreed_at }}</td>
+                                    <td class="py-3">
+                                        <span class="px-2 py-1 rounded text-xs font-semibold 
+                                            {% if ag.status == 'approved' %}bg-emerald-500/20 text-emerald-400
+                                            {% elif ag.status == 'pending' %}bg-amber-500/20 text-amber-400
+                                            {% else %}bg-rose-500/20 text-rose-400{% endif %}">
+                                            {% if ag.status == 'approved' %}✅ အတည်ပြုပြီး
+                                            {% elif ag.status == 'pending' %}⏳ စောင့်ဆိုင်းဆဲ
+                                            {% else %}❌ ပယ်ချထား{% endif %}
+                                        </span>
+                                    </td>
+                                    <td class="py-3 text-center">
+                                        {% if ag.status == 'pending' %}
+                                        <div class="flex items-center justify-center gap-2">
+                                            <button onclick="updateStatus({{ ag.id }}, 'approved')" 
+                                                class="px-3 py-1.5 bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30 rounded-lg text-xs font-semibold transition">
+                                                <i class="fa-solid fa-check"></i> Approve
+                                            </button>
+                                            <button onclick="updateStatus({{ ag.id }}, 'rejected')" 
+                                                class="px-3 py-1.5 bg-rose-500/20 text-rose-400 hover:bg-rose-500/30 rounded-lg text-xs font-semibold transition">
+                                                <i class="fa-solid fa-x"></i> Reject
+                                            </button>
+                                        </div>
+                                        {% else %}
+                                        <span class="text-xs text-slate-500">-</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td colspan="7" class="py-8 text-center text-slate-500">
+                                        <i class="fa-regular fa-file text-2xl block mb-2"></i>
+                                        သဘောတူချက်များ မရှိသေးပါ
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        function updateStatus(id, status) {
+            if (!confirm(`ဤသဘောတူချက်ကို "${status}" ဟု သေချာပြောင်းမည်လား?`)) return;
+            fetch(`/admin/user-agreements/${id}/status`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ status: status })
+            })
+            .then(res => res.json())
+            .then(data => { 
+                if (data.success) location.reload(); 
+                else alert('အမှားအယွင်းရှိပါသည်။'); 
+            })
+            .catch(err => alert('Network error'));
+        }
+    </script>
+
+</body>
+</html>

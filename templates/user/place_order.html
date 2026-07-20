@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Place Order | User Panel</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        * { font-family: 'Inter', sans-serif; }
+        body { background: #0a0a0f; }
+        .gradient-bg { 
+            background: radial-gradient(ellipse at 20% 30%, rgba(6, 182, 212, 0.08) 0%, transparent 60%),
+                        radial-gradient(ellipse at 80% 70%, rgba(15, 23, 42, 0.9) 0%, #0a0a0f 100%);
+            min-height: 100vh;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .glass-card:hover { border-color: rgba(255, 255, 255, 0.12); }
+        .input-primary {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 12px 16px;
+            color: white;
+            width: 100%;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+        .input-primary:focus {
+            outline: none;
+            border-color: rgba(6, 182, 212, 0.4);
+            box-shadow: 0 0 30px rgba(6, 182, 212, 0.05);
+            background: rgba(255, 255, 255, 0.06);
+        }
+        .input-primary::placeholder { color: rgba(255, 255, 255, 0.25); }
+        .input-primary option { background: #1a1a2e; color: white; }
+        select.input-primary {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='rgba(255,255,255,0.3)' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 16px center;
+            padding-right: 40px;
+            cursor: pointer;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #06b6d4, #0891b2);
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 25px rgba(6, 182, 212, 0.2);
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 40px rgba(6, 182, 212, 0.35);
+        }
+        .price-summary {
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            padding: 20px;
+        }
+        .price-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            font-size: 14px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+        }
+        .price-row:last-child { border-bottom: none; }
+        .price-row .label { color: rgba(255, 255, 255, 0.4); }
+        .price-row .value { font-weight: 600; }
+        .price-row.total {
+            border-top: 2px solid rgba(6, 182, 212, 0.2);
+            padding-top: 12px;
+            margin-top: 4px;
+        }
+        .price-row.total .label { color: rgba(255, 255, 255, 0.7); font-weight: 600; }
+        .price-row.total .value { color: #22d3ee; font-size: 20px; font-weight: 800; }
+        .service-info-box {
+            background: rgba(6, 182, 212, 0.04);
+            border: 1px solid rgba(6, 182, 212, 0.1);
+            border-radius: 12px;
+            padding: 16px;
+            animation: fadeSlideIn 0.3s ease-out;
+        }
+        @keyframes fadeSlideIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .type-badge {
+            padding: 3px 12px;
+            border-radius: 20px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+        .type-badge.standard { background: rgba(16, 185, 129, 0.12); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.15); }
+        .type-badge.express { background: rgba(251, 191, 36, 0.12); color: #fbbf24; border: 1px solid rgba(251, 191, 36, 0.15); }
+        .type-badge.premium { background: rgba(244, 63, 94, 0.12); color: #fb7185; border: 1px solid rgba(244, 63, 94, 0.15); }
+        .type-badge.general { background: rgba(168, 85, 247, 0.12); color: #a78bfa; border: 1px solid rgba(168, 85, 247, 0.15); }
+        .sidebar-stat {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            font-size: 13px;
+        }
+        .sidebar-stat:last-child { border-bottom: none; }
+        .sidebar-stat .stat-label { color: rgba(255, 255, 255, 0.4); }
+        .sidebar-stat .stat-value { font-weight: 600; color: white; }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(6, 182, 212, 0.3); border-radius: 10px; }
+        .discount-badge {
+            background: rgba(244, 63, 94, 0.1);
+            color: #fb7185;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        .price-display { font-variant-numeric: tabular-nums; }
+        .balance-display { font-variant-numeric: tabular-nums; }
+    </style>
+</head>
+<body>
+
+    <div class="flex h-screen overflow-hidden">
+        <!-- Sidebar -->
+        <aside class="w-64 bg-black/40 backdrop-blur-sm border-r border-white/5 p-4 flex flex-col fixed h-full overflow-y-auto">
+            <div class="flex items-center gap-3 pb-6 border-b border-white/5">
+                <div class="p-2.5 bg-gradient-to-br from-cyan-600 to-teal-600 rounded-xl shadow-lg shadow-cyan-500/20">
+                    <i class="fa-solid fa-chart-line text-white text-sm"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-sm tracking-wide text-white">User Panel</h1>
+                    <p class="text-[10px] text-white/40">{{ session.username }}</p>
+                </div>
+            </div>
+            <nav class="flex-1 py-5 space-y-1">
+                <a href="{{ url_for('user_dashboard') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm text-white/60 hover:bg-white/5 transition-all hover:text-white">
+                    <i class="fa-solid fa-gauge w-4"></i> ပင်မစာမျက်နှာ
+                </a>
+                <a href="{{ url_for('user_services') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm text-white/60 hover:bg-white/5 transition-all hover:text-white">
+                    <i class="fa-solid fa-list w-4"></i> ဝန်ဆောင်မှုများ
+                </a>
+                <a href="{{ url_for('user_place_order') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm bg-cyan-600/20 text-cyan-400 border border-cyan-500/20">
+                    <i class="fa-solid fa-cart-plus w-4"></i> အမှာစာတင်မည်
+                </a>
+                <a href="{{ url_for('user_deposit') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm text-white/60 hover:bg-white/5 transition-all hover:text-white">
+                    <i class="fa-solid fa-circle-dollar text-emerald-400 w-4"></i> ငွေသွင်းမည်
+                </a>
+                <a href="{{ url_for('user_tickets') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm text-white/60 hover:bg-white/5 transition-all hover:text-white">
+                    <i class="fa-solid fa-envelope-open-text w-4"></i> အကူအညီ
+                </a>
+            </nav>
+            <div class="border-t border-white/5 pt-4">
+                <a href="{{ url_for('logout') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm text-rose-400 hover:bg-rose-500/10 transition-all">
+                    <i class="fa-solid fa-right-from-bracket w-4"></i> ထွက်မည်
+                </a>
+            </div>
+        </aside>
+
+        <!-- Main -->
+        <main class="flex-1 p-8 ml-64 overflow-y-auto gradient-bg">
+            <div class="max-w-6xl mx-auto">
+
+                <div class="mb-8">
+                    <h2 class="text-2xl font-bold tracking-tight text-white">
+                        <span class="bg-gradient-to-r from-cyan-400 to-teal-400 bg-clip-text text-transparent">🛒 အမှာစာအသစ်တင်မည်</span>
+                    </h2>
+                    <p class="text-white/40 text-sm mt-1 flex items-center gap-2">
+                        <i class="fa-regular fa-clock"></i>
+                        {{ now.strftime('%Y-%m-%d %H:%M') }}
+                        <span class="text-white/20">•</span>
+                        <span class="text-white/20">1 USD = {{ exchange_rate }} MMK</span>
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+                    <!-- Main Form -->
+                    <div class="lg:col-span-2 glass-card rounded-2xl p-6">
+                        <form id="orderForm" class="space-y-5">
+
+                            <!-- Service Selection -->
+                            <div>
+                                <label class="block text-xs font-semibold text-white/40 uppercase tracking-wider mb-1.5">
+                                    <i class="fa-solid fa-tag mr-1.5"></i> ဝန်ဆောင်မှုရွေးပါ
+                                </label>
+                                <select id="serviceId" class="input-primary" required>
+                                    <option value="">— ဝန်ဆောင်မှုရွေးပါ —</option>
+                                    {% for service in services %}
+                                    <option value="{{ service.id }}" 
+                                            data-category="{{ service.category }}"
+                                            data-description="{{ service.description or '' }}"
+                                            data-rate="{{ service.rate }}" 
+                                            data-markup="{{ service.markup }}"
+                                            data-type="{{ service.service_type }}"
+                                            data-min="{{ service.min_order }}"
+                                            data-max="{{ service.max_order }}"
+                                            data-display-price="{{ service.display_price_mmk }}">
+                                        {{ service.category }} — {{ service.name }}
+                                        ({{ "%.0f"|format(service.display_price_mmk) }} MMK/1K)
+                                        {% if service.service_type == 'express' %} ⚡
+                                        {% elif service.service_type == 'premium' %} ⭐
+                                        {% elif service.service_type == 'general' %} 🟣
+                                        {% endif %}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <!-- Service Info -->
+                            <div id="serviceInfo" class="hidden service-info-box">
+                                <div class="grid grid-cols-2 gap-3">
+                                    <div>
+                                        <p class="text-xs text-white/30 uppercase tracking-wider">အမျိုးအစား</p>
+                                        <p id="serviceCategory" class="text-sm text-white font-medium mt-0.5">—</p>
+                                    </div>
+                                    <div>
+                                        <p class="text-xs text-white/30 uppercase tracking-wider">ဝန်ဆောင်မှုအဆင့်</p>
+                                        <p id="serviceTypeBadge" class="mt-0.5">—</p>
+                                    </div>
+                                    <div>
+                                        <p class="text-xs text-white/30 uppercase tracking-wider">နှုန်းထား (MMK/1K)</p>
+                                        <p id="serviceRate" class="text-sm text-cyan-400 font-mono font-semibold mt-0.5">—</p>
+                                    </div>
+                                    <div>
+                                        <p class="text-xs text-white/30 uppercase tracking-wider">အနိမ့်/အမြင့်</p>
+                                        <p id="serviceMinMax" class="text-sm text-white font-medium mt-0.5">—</p>
+                                    </div>
+                                </div>
+                                <div class="mt-3 pt-3 border-t border-white/5">
+                                    <p class="text-xs text-white/30 uppercase tracking-wider">ဖော်ပြချက်</p>
+                                    <p id="serviceDescription" class="text-sm text-white/60 mt-0.5">—</p>
+                                </div>
+                            </div>
+
+                            <!-- Link -->
+                            <div>
+                                <label class="block text-xs font-semibold text-white/40 uppercase tracking-wider mb-1.5">
+                                    <i class="fa-solid fa-link mr-1.5"></i> Link / URL
+                                </label>
+                                <input type="url" id="link" required placeholder="https://www.instagram.com/username" class="input-primary">
+                            </div>
+
+                            <!-- Quantity -->
+                            <div>
+                                <label class="block text-xs font-semibold text-white/40 uppercase tracking-wider mb-1.5">
+                                    <i class="fa-solid fa-hashtag mr-1.5"></i> အရေအတွက်
+                                </label>
+                                <input type="number" id="quantity" required min="100" step="100" placeholder="100" class="input-primary">
+                            </div>
+
+                            <!-- Price Summary -->
+                            <div class="price-summary">
+                                <div class="price-row">
+                                    <span class="label">မူလကျသင့်ငွေ</span>
+                                    <span id="originalPrice" class="value text-white/60 font-mono price-display">0 MMK</span>
+                                </div>
+                                <div class="price-row">
+                                    <span class="label flex items-center gap-2">
+                                        လျှော့စျေး
+                                        <span id="discountPercentDisplay" class="discount-badge">0%</span>
+                                    </span>
+                                    <span id="discountAmount" class="value text-rose-400 font-mono price-display">- 0 MMK</span>
+                                </div>
+                                <div class="price-row total">
+                                    <span class="label">စုစုပေါင်းကျသင့်ငွေ</span>
+                                    <span id="totalPrice" class="value text-cyan-400 font-mono price-display">0 MMK</span>
+                                </div>
+                                <div class="flex justify-between items-center mt-4 pt-4 border-t border-white/5">
+                                    <span class="text-sm text-white/40">သင့်လက်ကျန်</span>
+                                    <span id="userBalance" class="text-sm font-semibold text-white balance-display">{{ "%.0f"|format(balance) }} MMK</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-sm text-white/40">ကျန်လက်ကျန်</span>
+                                    <span id="remainingBalance" class="text-sm font-semibold text-emerald-400 balance-display">{{ "%.0f"|format(balance) }} MMK</span>
+                                </div>
+                            </div>
+
+                            <button type="submit" class="btn-primary w-full text-white font-bold py-3.5 rounded-xl transition flex items-center justify-center gap-2 text-sm tracking-wide">
+                                <i class="fa-solid fa-paper-plane"></i> အမှာစာတင်မည်
+                            </button>
+
+                        </form>
+                    </div>
+
+                    <!-- Sidebar Info -->
+                    <div class="glass-card rounded-2xl p-6 h-fit">
+                        <h3 class="text-sm font-semibold text-white/60 uppercase tracking-wider mb-4 flex items-center gap-2">
+                            <i class="fa-regular fa-circle-info text-cyan-400"></i>
+                            အချက်အလက်
+                        </h3>
+                        <div class="space-y-1">
+                            <div class="sidebar-stat">
+                                <span class="stat-label">သင့်လက်ကျန်</span>
+                                <span class="stat-value">{{ "%.0f"|format(balance) }} MMK</span>
+                            </div>
+                            <div class="sidebar-stat">
+                                <span class="stat-label">သင့်အဆင့် (Tier)</span>
+                                <span class="stat-value capitalize">{{ tier }}</span>
+                            </div>
+                            <div class="sidebar-stat">
+                                <span class="stat-label flex items-center gap-2">
+                                    လျှော့စျေး
+                                    <span id="userDiscountDisplay" class="text-emerald-400 text-xs font-bold">0%</span>
+                                </span>
+                                <span class="stat-value text-emerald-400" id="userDiscountValue">0%</span>
+                            </div>
+                            <div class="sidebar-stat">
+                                <span class="stat-label">ငွေကြေး</span>
+                                <span class="stat-value">MMK</span>
+                            </div>
+                            <div class="sidebar-stat border-b-0">
+                                <span class="stat-label">Exchange Rate</span>
+                                <span class="stat-value text-cyan-400">1 USD = {{ exchange_rate }} MMK</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const EXCHANGE_RATE = {{ exchange_rate|tojson }};
+        const initialBalance = {{ balance|tojson }};
+        let userDiscountPercent = 0;
+
+        fetch('/api/user/settings')
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    userDiscountPercent = data.discount || 0;
+                    document.getElementById('userDiscountDisplay').textContent = userDiscountPercent + '%';
+                    document.getElementById('userDiscountValue').textContent = userDiscountPercent + '%';
+                    document.getElementById('discountPercentDisplay').textContent = userDiscountPercent + '%';
+                    calculatePrice();
+                }
+            })
+            .catch(() => console.log('Using default settings'));
+
+        const serviceSelect = document.getElementById('serviceId');
+        const quantityInput = document.getElementById('quantity');
+        const infoDiv = document.getElementById('serviceInfo');
+
+        serviceSelect.addEventListener('change', function() {
+            const selected = this.options[this.selectedIndex];
+            if (selected.value) {
+                infoDiv.classList.remove('hidden');
+                document.getElementById('serviceCategory').textContent = selected.dataset.category || '—';
+                document.getElementById('serviceDescription').textContent = selected.dataset.description || 'ဖော်ပြချက်မရှိပါ';
+
+                const min = parseInt(selected.dataset.min) || 100;
+                const max = parseInt(selected.dataset.max) || 100000;
+                document.getElementById('serviceMinMax').textContent = min + ' — ' + max;
+                quantityInput.min = min;
+                quantityInput.max = max;
+                quantityInput.placeholder = min;
+
+                const displayPrice = parseFloat(selected.dataset.displayPrice) || 0;
+                document.getElementById('serviceRate').textContent = displayPrice.toFixed(0) + ' MMK/1K';
+
+                const type = selected.dataset.type || 'standard';
+                const badge = document.getElementById('serviceTypeBadge');
+                const typeMap = {
+                    'express': ['type-badge express', '⚡ အမြန် (Express)'],
+                    'premium': ['type-badge premium', '⭐ Premium'],
+                    'general': ['type-badge general', '🟣 General'],
+                    'standard': ['type-badge standard', '🟢 စျေးသက်သာ (Standard)']
+                };
+                const [cls, label] = typeMap[type] || typeMap.standard;
+                badge.className = cls;
+                badge.textContent = label;
+            } else {
+                infoDiv.classList.add('hidden');
+            }
+            calculatePrice();
+        });
+
+        quantityInput.addEventListener('input', calculatePrice);
+
+        function calculatePrice() {
+            const selected = serviceSelect.options[serviceSelect.selectedIndex];
+            const quantity = parseInt(quantityInput.value) || 0;
+
+            if (!selected.value || !quantity) {
+                document.getElementById('originalPrice').textContent = '0 MMK';
+                document.getElementById('discountAmount').textContent = '- 0 MMK';
+                document.getElementById('totalPrice').textContent = '0 MMK';
+                document.getElementById('remainingBalance').textContent = initialBalance.toFixed(0) + ' MMK';
+                document.getElementById('remainingBalance').className = 'text-sm font-semibold text-emerald-400';
+                return;
+            }
+
+            const displayPrice = parseFloat(selected.dataset.displayPrice) || 0;
+            const totalPrice = (quantity / 1000) * displayPrice;
+            const discountPct = userDiscountPercent || 0;
+            const discountAmountVal = totalPrice * (discountPct / 100);
+            const finalPrice = totalPrice - discountAmountVal;
+            const remaining = initialBalance - finalPrice;
+
+            document.getElementById('originalPrice').textContent = totalPrice.toFixed(0) + ' MMK';
+            document.getElementById('discountAmount').textContent = '- ' + discountAmountVal.toFixed(0) + ' MMK';
+            document.getElementById('totalPrice').textContent = finalPrice.toFixed(0) + ' MMK';
+
+            const remainingEl = document.getElementById('remainingBalance');
+            remainingEl.textContent = remaining.toFixed(0) + ' MMK';
+            remainingEl.className = 'text-sm font-semibold ' + (remaining >= 0 ? 'text-emerald-400' : 'text-rose-400');
+        }
+
+        document.getElementById('orderForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const serviceId = document.getElementById('serviceId').value;
+            const link = document.getElementById('link').value;
+            const quantity = document.getElementById('quantity').value;
+
+            if (!serviceId || !link || !quantity) {
+                alert('ကျေးဇူးပြု၍ အချက်အလက်အားလုံးကို ဖြည့်ပါ။');
+                return;
+            }
+
+            const btn = this.querySelector('button[type="submit"]');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i> ပို့နေပါသည်...';
+
+            fetch('/api/reseller/place-order', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    service_id: parseInt(serviceId),
+                    link: link,
+                    quantity: parseInt(quantity)
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    alert('✅ အမှာစာ အောင်မြင်စွာ တင်ပြီးပါပြီ။\nOrder ID: #' + data.order_id);
+                    window.location.reload();
+                } else {
+                    alert('❌ ' + (data.error || data.message || 'အမှာစာတင်ရာတွင် အမှားရှိပါသည်။'));
+                }
+            })
+            .catch(err => alert('❌ Error: ' + err.message))
+            .finally(() => {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> အမှာစာတင်မည်';
+            });
+        });
+
+        setTimeout(calculatePrice, 300);
+    </script>
+
+</body>
+</html>
