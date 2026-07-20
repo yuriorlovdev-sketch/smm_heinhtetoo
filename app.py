@@ -40,7 +40,8 @@ def get_db():
         port=int(os.getenv('DB_PORT', 3306)),
         charset='utf8mb4',
         cursorclass=pymysql.cursors.DictCursor,
-        autocommit=False
+        autocommit=False,
+        ssl={'ssl': {}}
     )
     return conn
 
